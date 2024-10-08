@@ -14,7 +14,7 @@
 
 ##### Example config file.
 ```
-./config/config.txt
+./data/data.txt
 ./output/output.txt
 10
 1
