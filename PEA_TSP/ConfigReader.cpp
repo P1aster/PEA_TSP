@@ -19,6 +19,7 @@ bool ConfigReader::checkPathIsFile(std::string path) {
     return false;
 }
 
+
 bool ConfigReader::createPath(std::string path) {
     try {
         // Create directories if they don't exist
@@ -108,3 +109,27 @@ std::string ConfigReader::getOutputPath() { return outputPath; }
 int ConfigReader::getRepeatNumber() { return repeatNumber; }
 
 int ConfigReader::getCoutFlag() { return coutFlag; }
+
+bool ConfigReader::openOutputFile() {
+    outputFileOpt.emplace(outputPath); // try open file
+    if (outputFileOpt->is_open()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void ConfigReader::writeToOutputFile(const std::string& content) {
+    if (outputFileOpt && outputFileOpt->is_open()) {
+        *outputFileOpt << content;
+    }
+    else {
+        std::cerr << "Output file is not open." << std::endl;
+    }
+}
+
+void ConfigReader::closeOutputFile() {
+    if (outputFileOpt && outputFileOpt->is_open()) {
+        outputFileOpt->close();
+    }
+}
