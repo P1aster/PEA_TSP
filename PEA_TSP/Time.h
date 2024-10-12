@@ -9,6 +9,6 @@ private:
 public: 
     void start();
     void stop();
-    long long getElapsedTime();
+    float getElapsedTime();
 };
 
