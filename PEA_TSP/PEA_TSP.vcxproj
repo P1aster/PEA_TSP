@@ -124,9 +124,9 @@
   <ItemGroup>
     <ClCompile Include="algorithms\BB.cpp" />
     <ClCompile Include="algorithms\BF.cpp" />
+    <ClCompile Include="algorithms\R.cpp" />
     <ClCompile Include="algorithms\RNN.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="R.cpp" />
     <ClCompile Include="structures\Graph.cpp" />
     <ClCompile Include="utils\Config.cpp" />
     <ClCompile Include="utils\Time.cpp" />
@@ -134,8 +134,8 @@
   <ItemGroup>
     <ClInclude Include="algorithms\BB.h" />
     <ClInclude Include="algorithms\BF.h" />
+    <ClInclude Include="algorithms\R.h" />
     <ClInclude Include="algorithms\RNN.h" />
-    <ClInclude Include="R.h" />
     <ClInclude Include="structures\Graph.h" />
     <ClInclude Include="structures\TSP_Result.h" />
     <ClInclude Include="utils\Config.h" />

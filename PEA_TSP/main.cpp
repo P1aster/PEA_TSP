@@ -1,10 +1,10 @@
 #include <iostream>
 #include "algorithms/BF.h"
 #include "algorithms/BB.h"
+#include "algorithms/R.h"
 #include "algorithms/RNN.h"
 #include "utils/Config.h"
 #include "utils/Time.h"
-
 #include "structures/Graph.h"
 
 
@@ -60,9 +60,24 @@ int main(int argslen, char* args[]) {
         BB bb(graph);
         BF bf(graph);
 		RNN rnn(graph);
+        R r(graph);
+
 
         timer.start();
-        result = bf.findCheapestHamiltonianCircle();
+        result = r.findRandomHamiltonianCircle();
+        timer.stop();
+
+        std::cout << "R: Min path cost: " << result.minPathCost << "\n";
+        std::cout << "R: Best path: ";
+        std::cout << timer.getElapsedTime() << " ms\n";
+        for (int i = 0; i < result.bestPath.size(); i++) {
+            std::cout << result.bestPath[i] << " ";
+        }
+        std::cout << "\n\n";
+
+
+        timer.start();
+        result = bf.findCheapestHamiltonianCircle(0);
         timer.stop();
 
         std::cout << "BF: Min path cost: " << result.minPathCost << "\n";
@@ -75,7 +90,7 @@ int main(int argslen, char* args[]) {
 
 
         timer.start();
-        result = rnn.findNearestNaighbour();
+        result = rnn.findNearestNaighbour(0);
         timer.stop();
 
         std::cout << "NN: Min path cost: " << result.minPathCost << "\n";
@@ -116,7 +131,7 @@ int main(int argslen, char* args[]) {
             config.cout("Processing instance: " + std::to_string(i + 1) + " [begin] \n");
 
             timer.start();
-            result = bf.findCheapestHamiltonianCircle();
+            result = bf.findCheapestHamiltonianCircle(0);
             timer.stop();
             config.writeToOutputFile(std::to_string(i+1)+ "," + std::to_string(timer.getElapsedTime()) + "\n");
 
@@ -162,7 +177,7 @@ int main(int argslen, char* args[]) {
                     config.cout("Processing instance: " + std::to_string(i + 1) + " [begin] \n");
 
                     timer.start();
-                    result = bf.findCheapestHamiltonianCircle();
+                    result = bf.findCheapestHamiltonianCircle(0);
                     timer.stop();
 
                     config.writeToOutputFile(std::to_string(i + 1) + "," + std::to_string(timer.getElapsedTime()) + "\n");

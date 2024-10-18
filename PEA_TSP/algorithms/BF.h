@@ -11,10 +11,12 @@ class BF {
 private:
     int nodesNumber;
     int** matrix;
-    void req_findCheapestHamiltonianCircle(std::vector<int>& path, std::vector<bool> visited, int current, int currentCost, int& minCost, std::vector<int>& bestPath);
+    std::vector<int> bestPath;
+    int minPathCost = INT_MAX;
+    void req_findCheapestHamiltonianCircle(std::vector<int> path, std::vector<bool> visited, int current, int currentCost);
 
 public:
     BF(Graph graph);
-    TSP_Result findCheapestHamiltonianCircle();
+    TSP_Result findCheapestHamiltonianCircle(int start_node);
 };
 

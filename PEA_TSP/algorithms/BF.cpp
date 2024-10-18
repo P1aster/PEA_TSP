@@ -5,18 +5,19 @@ BF::BF(Graph graph) {
     this->matrix = graph.getMatrix();
 }
 
-TSP_Result BF::findCheapestHamiltonianCircle() {
+TSP_Result BF::findCheapestHamiltonianCircle(int start_node) {
+
+    if (start_node > nodesNumber-1) {
+		throw std::invalid_argument("Invalid start node");
+    }
 
     TSP_Result result;
-
-    std::vector<int> bestPath;
     std::vector<int> path;
-    path.push_back(0);
+    path.push_back(start_node);
     std::vector<bool> visited(nodesNumber, false);
-    visited[0] = true; 
-    int minPathCost = INT_MAX;
+    visited[start_node] = true;
 
-    this->req_findCheapestHamiltonianCircle(path, visited, 0, 0, minPathCost, bestPath);
+    this->req_findCheapestHamiltonianCircle(path, visited, start_node, 0);
 
     result.bestPath = bestPath;
     result.minPathCost = minPathCost; 
@@ -24,16 +25,15 @@ TSP_Result BF::findCheapestHamiltonianCircle() {
     return result;
 }
 
-void BF::req_findCheapestHamiltonianCircle(std::vector<int>&path, std::vector<bool>visited, int current, int currentCost, int& minCost, std::vector<int>& bestPath ) {
-
+void BF::req_findCheapestHamiltonianCircle(std::vector<int>path, std::vector<bool>visited, int current, int currentCost) {
     int newCost = 0;
 
     if (path.size() == nodesNumber) {
-        // Check if there is an edge to complete the cycle
+
         if (matrix[path.back()][path[0]] > 0) {
             int totalCost = currentCost + matrix[current][path[0]];
-            if (totalCost < minCost) {
-                minCost = totalCost;
+            if (totalCost < minPathCost) {
+                minPathCost = totalCost;
                 bestPath = path;
                 bestPath.push_back(path[0]);
             }
@@ -45,14 +45,14 @@ void BF::req_findCheapestHamiltonianCircle(std::vector<int>&path, std::vector<bo
     for (int next = 0; next < nodesNumber; ++next) {
         if (!visited[next] && matrix[current][next] > 0) {
             newCost = currentCost + matrix[current][next];
-            if (newCost >= minCost) {
+            if (newCost >= minPathCost) {
                 continue; 
             }
 
             visited[next] = true;
             path.push_back(next);
 
-            req_findCheapestHamiltonianCircle(path, visited, next, newCost, minCost, bestPath);
+            req_findCheapestHamiltonianCircle(path, visited, next, newCost);
 
             path.pop_back(); 
             visited[next] = false; 

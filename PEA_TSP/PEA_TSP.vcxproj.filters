@@ -36,7 +36,7 @@
     <ClCompile Include="utils\Time.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="R.cpp">
+    <ClCompile Include="algorithms\R.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,7 +62,7 @@
     <ClInclude Include="utils\Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="R.h">
+    <ClInclude Include="algorithms\R.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

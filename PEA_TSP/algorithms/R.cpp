@@ -1,20 +1,45 @@
 #include "R.h"
-#include <random>
+
 
 R::R(Graph graph) {
     this->nodesNumber = graph.getNodesNumber();
     this->matrix = graph.getMatrix();
+	this->knownMinPathCost = 0;
 }
 
-TSP_Result R::RandomCircle() {
+int R::getRandomVertex(std::vector<bool> visited) {
+    std::vector<int> unvisited;
 
-    TSP_Result result;
+    for (int i = 0; i < nodesNumber; ++i) {
+        if (!visited[i]) {
+            unvisited.push_back(i);
+        }
+    }
 
+    if (!unvisited.empty()) {
+        int randIndex = rand() % unvisited.size();
+        return unvisited[randIndex];
+    }
+    return -1;
+
+}
+
+TSP_Result R::findRandomHamiltonianCircle() {
+
+	srand(time(0));
+
+	TSP_Result result;
+	std::vector<int> totalBestPath;
+	int totalMinPathCost = INT_MAX;
 	std::vector<int> path;
-    std::vector<int> bestPath;
-    int minPathCost = INT_MAX;
+	std::vector<bool> visited(nodesNumber, false);
 
-    findCycle();
+	int start_node = rand() % nodesNumber;
+
+	path.push_back(start_node);
+	visited[start_node] = true;
+
+	this->req_findRandomHamiltonianCircle(path, visited, start_node, 0);
 
 	result.bestPath = bestPath;
 	result.minPathCost = minPathCost;
@@ -22,64 +47,39 @@ TSP_Result R::RandomCircle() {
 	return result;
 }
 
+void R::req_findRandomHamiltonianCircle(std::vector<int> path, std::vector<bool> visited, int current, int currentCost) {
+    int newCost = 0;
 
-int R::getRandomInt(int min, int max) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distr(min, max);
-	return distr(gen);
-}
-
-int R::getNextRandomVertex(std::vector<bool>visited, int current) {
-
-
-    std::vector<int> candidates;
-    for (int i = 0; i < nodesNumber; ++i) {
-        if (!visited[i] && matrix[current][i] > 0) {
-            candidates.push_back(i);
-        }
-    }
-    if (candidates.empty()) {
-        return -1;
-    }
-    int randomIndex = getRandomInt(0, candidates.size()-1);
-    return candidates[randomIndex];
-   ;
-}
-
-void R::findCycle(std::vector<int>&path, int& minCost) {
     
-    bool stopper = true;
-    int currentCost = 0;
-    std::vector<bool> visited(nodesNumber, false);
-    int random = getRandomInt(0, nodesNumber - 1);
-    visited[random] = true;
-    int current = random;
-    int next;
-
-    do {
-        if (path.size() == nodesNumber) {
-            if (matrix[path.back()][path[0]] > 0) {
-                int totalCost = currentCost + matrix[current][path[0]];
-                path.push_back(path[0]);
+    if (path.size() == nodesNumber) {
+        if (matrix[path.back()][path[0]] > 0) {
+            int totalCost = currentCost + matrix[current][path[0]];
+            if (totalCost < minPathCost) {
+                minPathCost = totalCost;
+                bestPath = path;
+                bestPath.push_back(path[0]);
             }
-            stopper = false;
         }
-        else {
-			next = getNextRandomVertex(visited, current);
-			if (current == -1) {
-				stopper = false;
-			} else {
-				currentCost += matrix[current][next];
-				visited[next] = true;
-				path.push_back(next);
-				current = next;
-			}
+        return;
+    }
+
+    for (int attempt = 0; attempt < nodesNumber - path.size(); ++attempt) {
+        int next = getRandomVertex(visited);
+        if (next == -1 || matrix[current][next] <= 0) {
+            continue; 
         }
 
-        if (currentCost > minCost) {
-            stopper = false;
-        }
+        visited[next] = true;
+        path.push_back(next);
 
-    } while (stopper);
+        newCost = currentCost + matrix[current][next];
+
+        req_findRandomHamiltonianCircle(path, visited, next, newCost);
+
+        visited[next] = false;
+        path.pop_back();
+    }
 }
+
+
+
