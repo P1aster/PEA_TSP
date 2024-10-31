@@ -5,6 +5,7 @@ R::R(Graph graph) {
     this->nodesNumber = graph.getNodesNumber();
     this->matrix = graph.getMatrix();
 	this->knownMinPathCost = 0;
+    this->minPathCost = INT_MAX;
 }
 
 int R::getRandomVertex(std::vector<bool> visited) {
@@ -26,8 +27,9 @@ int R::getRandomVertex(std::vector<bool> visited) {
 
 TSP_Result R::findRandomHamiltonianCircle() {
 
-	srand(time(0));
+	srand(time(nullptr));
 
+    this->minPathCost = INT_MAX;
 	TSP_Result result;
 	std::vector<int> totalBestPath;
 	int totalMinPathCost = INT_MAX;

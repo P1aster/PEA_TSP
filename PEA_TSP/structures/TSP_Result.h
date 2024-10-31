@@ -3,5 +3,5 @@
 
 struct TSP_Result {
     std::vector<int> bestPath;
-    int minPathCost;
+    int minPathCost = INT_MAX;
 };

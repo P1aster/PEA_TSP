@@ -3,14 +3,16 @@
 BF::BF(Graph graph) {
     this->nodesNumber = graph.getNodesNumber();
     this->matrix = graph.getMatrix();
+    this->minPathCost = INT_MAX;
 }
 
 TSP_Result BF::findCheapestHamiltonianCircle(int start_node) {
 
-    if (start_node > nodesNumber-1) {
+    if (start_node > nodesNumber-1 || start_node < 0) {
 		throw std::invalid_argument("Invalid start node");
     }
 
+    minPathCost = INT_MAX;
     TSP_Result result;
     std::vector<int> path;
     path.push_back(start_node);
@@ -29,9 +31,8 @@ void BF::req_findCheapestHamiltonianCircle(std::vector<int>path, std::vector<boo
     int newCost = 0;
 
     if (path.size() == nodesNumber) {
-
         if (matrix[path.back()][path[0]] > 0) {
-            int totalCost = currentCost + matrix[current][path[0]];
+            int totalCost = currentCost + matrix[path.back()][path[0]];
             if (totalCost < minPathCost) {
                 minPathCost = totalCost;
                 bestPath = path;

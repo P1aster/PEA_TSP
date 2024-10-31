@@ -136,6 +136,7 @@
     <ClInclude Include="algorithms\BF.h" />
     <ClInclude Include="algorithms\R.h" />
     <ClInclude Include="algorithms\RNN.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="structures\Graph.h" />
     <ClInclude Include="structures\TSP_Result.h" />
     <ClInclude Include="utils\Config.h" />

@@ -4,6 +4,7 @@
 RNN::RNN(Graph graph) {
     this->nodesNumber = graph.getNodesNumber();
     this->matrix = graph.getMatrix();
+    this->minPathCost = INT_MAX;
 }
 
 TSP_Result RNN::findRepeatedNearestNaighbour() {
@@ -43,6 +44,7 @@ TSP_Result RNN::findNearestNaighbour(int start_node) {
         throw std::invalid_argument("Invalid start node");
     }
 
+    this->minPathCost = INT_MAX;
     TSP_Result result;
     std::vector<int> path;
     path.push_back(start_node);

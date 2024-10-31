@@ -12,7 +12,7 @@ private:
     int nodesNumber;
     int** matrix;
     std::vector<int> bestPath;
-    int minPathCost = INT_MAX;
+    int minPathCost;
     void req_findCheapestHamiltonianCircle(std::vector<int> path, std::vector<bool> visited, int current, int currentCost);
 
 public:

@@ -1,4 +1,4 @@
-./data/matrix_6.txt
+./data/matrix_11.txt
 ./output/output.txt
-10
+1
 1

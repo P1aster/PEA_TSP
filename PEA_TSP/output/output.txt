@@ -1,14 +1,4 @@
 Instance,Brute force algorithm
-Input Path,./data/matrix_6.txt
-Nodes Number,6
+Input Path,./data/matrix_11.txt
+Nodes Number,11
 Time,[ms]
-1,1.374400
-2,1.196300
-3,1.074500
-4,1.332700
-5,1.142900
-6,1.036500
-7,1.241300
-8,1.187100
-9,1.028500
-10,1.233200

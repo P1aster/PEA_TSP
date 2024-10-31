@@ -6,6 +6,10 @@
 #include "utils/Config.h"
 #include "utils/Time.h"
 #include "structures/Graph.h"
+#include <queue>
+
+
+
 
 
 
@@ -63,7 +67,7 @@ int main(int argslen, char* args[]) {
         R r(graph);
 
 
-        timer.start();
+        /*timer.start();
         result = r.findRandomHamiltonianCircle();
         timer.stop();
 
@@ -73,7 +77,7 @@ int main(int argslen, char* args[]) {
         for (int i = 0; i < result.bestPath.size(); i++) {
             std::cout << result.bestPath[i] << " ";
         }
-        std::cout << "\n\n";
+        std::cout << "\n\n";*/
 
 
         timer.start();
@@ -101,6 +105,7 @@ int main(int argslen, char* args[]) {
         }
         std::cout << "\n\n";
 
+
         timer.start();
         result = rnn.findRepeatedNearestNaighbour();
         timer.stop();
@@ -114,19 +119,24 @@ int main(int argslen, char* args[]) {
         std::cout << "\n\n";
 
 
-        timer.start();
-        result = bb.findCheapestHamiltonianCircle();
-        timer.stop();
 
-        std::cout << "BB: Min path cost: " << result.minPathCost << "\n";
-        std::cout << "BB: Best path: ";
-        std::cout << timer.getElapsedTime() << " ms\n";
-        for (int i = 0; i < result.bestPath.size(); i++) {
-            std::cout << result.bestPath[i] << " ";
+        for (int i = 0; i < 6; i++) {
+
+            timer.start();
+            result = bb.findCheapestHamiltonianCircle_BFS(i);
+            timer.stop();
+
+            std::cout << "BB_BFS: Min path cost: " << result.minPathCost << "\n";
+            std::cout << "BB_BFS: Best path: ";
+            std::cout << timer.getElapsedTime() << " ms\n";
+            for (int i = 0; i < result.bestPath.size(); i++) {
+                std::cout << result.bestPath[i] << " ";
+            }
+            std::cout << "\n\n";
         }
-        std::cout << "\n\n";
 
-        for (int i = 0; i < repeats; i++) {
+
+      /*  for (int i = 0; i < repeats; i++) {
 
             config.cout("Processing instance: " + std::to_string(i + 1) + " [begin] \n");
 
@@ -136,7 +146,7 @@ int main(int argslen, char* args[]) {
             config.writeToOutputFile(std::to_string(i+1)+ "," + std::to_string(timer.getElapsedTime()) + "\n");
 
             config.cout("Processing instance: " + std::to_string(i + 1) + " [end] \n");
-        }
+        }*/
 
         std::cout << std::endl;
     }
