@@ -67,8 +67,8 @@ int main(int argslen, char* args[]) {
         R r(graph);
 
 
-        /*timer.start();
-        result = r.findRandomHamiltonianCircle();
+        timer.start();
+        result = r.findBestRandomHamiltonianCircle();
         timer.stop();
 
         std::cout << "R: Min path cost: " << result.minPathCost << "\n";
@@ -77,7 +77,9 @@ int main(int argslen, char* args[]) {
         for (int i = 0; i < result.bestPath.size(); i++) {
             std::cout << result.bestPath[i] << " ";
         }
-        std::cout << "\n\n";*/
+        std::cout << "\n\n";
+
+
 
 
         timer.start();

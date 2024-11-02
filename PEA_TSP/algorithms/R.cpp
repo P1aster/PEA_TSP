@@ -1,87 +1,93 @@
 #include "R.h"
-
+#include <random>
+#include <numeric>
 
 R::R(Graph graph) {
     this->nodesNumber = graph.getNodesNumber();
     this->matrix = graph.getMatrix();
-	this->knownMinPathCost = 0;
     this->minPathCost = INT_MAX;
 }
 
-int R::getRandomVertex(std::vector<bool> visited) {
-    std::vector<int> unvisited;
+TSP_Result R::findBestRandomHamiltonianCircle(int permutations) {
+    std::random_device rd;
+    std::mt19937 g(rd());
 
-    for (int i = 0; i < nodesNumber; ++i) {
-        if (!visited[i]) {
-            unvisited.push_back(i);
+    TSP_Result result;
+    minPathCost = INT_MAX;
+
+    std::vector<int> nodes(nodesNumber);
+    std::iota(nodes.begin(), nodes.end(), 0); // Fill nodes with 0, 1, ..., nodesNumber-1
+
+    for (int i = 0; i < permutations; ++i) { // Try [n] random permutations
+        std::shuffle(nodes.begin(), nodes.end(), g);
+
+        int currentCost = 0;
+        bool validCycle = true;
+
+        for (int j = 0; j < nodesNumber; ++j) {
+            int from = nodes[j];
+            int to = nodes[(j + 1) % nodesNumber];
+            if (matrix[from][to] <= 0) {
+                validCycle = false;
+                break;
+            }
+            currentCost += matrix[from][to];
+        }
+
+        if (validCycle && currentCost < result.minPathCost) {
+            result.minPathCost = currentCost;
+            result.bestPath = nodes;
+            result.bestPath.push_back(nodes[0]);
         }
     }
 
-    if (!unvisited.empty()) {
-        int randIndex = rand() % unvisited.size();
-        return unvisited[randIndex];
-    }
-    return -1;
-
-}
-
-TSP_Result R::findRandomHamiltonianCircle() {
-
-	srand(time(nullptr));
-
-    this->minPathCost = INT_MAX;
-	TSP_Result result;
-	std::vector<int> totalBestPath;
-	int totalMinPathCost = INT_MAX;
-	std::vector<int> path;
-	std::vector<bool> visited(nodesNumber, false);
-
-	int start_node = rand() % nodesNumber;
-
-	path.push_back(start_node);
-	visited[start_node] = true;
-
-	this->req_findRandomHamiltonianCircle(path, visited, start_node, 0);
-
-	result.bestPath = bestPath;
+    result.bestPath;
 	result.minPathCost = minPathCost;
 
-	return result;
+    return result;
 }
 
-void R::req_findRandomHamiltonianCircle(std::vector<int> path, std::vector<bool> visited, int current, int currentCost) {
-    int newCost = 0;
+TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, int knownMinPathCost) {
+    std::random_device rd;
+    std::mt19937 g(rd());
 
-    
-    if (path.size() == nodesNumber) {
-        if (matrix[path.back()][path[0]] > 0) {
-            int totalCost = currentCost + matrix[current][path[0]];
-            if (totalCost < minPathCost) {
-                minPathCost = totalCost;
-                bestPath = path;
-                bestPath.push_back(path[0]);
+    TSP_Result result;
+    minPathCost = INT_MAX;
+
+    std::vector<int> nodes(nodesNumber);
+    std::iota(nodes.begin(), nodes.end(), 0); // Fill nodes with 0, 1, ..., nodesNumber-1
+
+    int maxPermutations = permutations.value_or(std::numeric_limits<int>::max());
+    int totalPermutations = std::min(maxPermutations, static_cast<int>(std::tgamma(nodesNumber + 1))); // n!
+
+    for (int i = 0; i < totalPermutations; ++i) { // Try [n] random permutations
+        std::shuffle(nodes.begin(), nodes.end(), g);
+
+        int currentCost = 0;
+        bool validCycle = true;
+
+        for (int j = 0; j < nodesNumber; ++j) {
+            int from = nodes[j];
+            int to = nodes[(j + 1) % nodesNumber];
+            if (matrix[from][to] <= 0) {
+                validCycle = false;
+                break;
             }
-        }
-        return;
-    }
-
-    for (int attempt = 0; attempt < nodesNumber - path.size(); ++attempt) {
-        int next = getRandomVertex(visited);
-        if (next == -1 || matrix[current][next] <= 0) {
-            continue; 
+            currentCost += matrix[from][to];
         }
 
-        visited[next] = true;
-        path.push_back(next);
+        if (validCycle && currentCost < result.minPathCost) {
+            result.minPathCost = currentCost;
+            result.bestPath = nodes;
+            result.bestPath.push_back(nodes[0]);
+        }
 
-        newCost = currentCost + matrix[current][next];
-
-        req_findRandomHamiltonianCircle(path, visited, next, newCost);
-
-        visited[next] = false;
-        path.pop_back();
+        if (result.minPathCost <= knownMinPathCost) {
+            break;
+        }
     }
+
+    result.minPathCost = minPathCost;
+
+    return result;
 }
-
-
-
