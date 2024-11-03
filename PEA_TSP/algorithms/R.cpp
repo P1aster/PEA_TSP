@@ -9,6 +9,7 @@ R::R(Graph graph) {
 }
 
 TSP_Result R::findBestRandomHamiltonianCircle(int permutations) {
+
     std::random_device rd;
     std::mt19937 g(rd());
 
@@ -16,6 +17,7 @@ TSP_Result R::findBestRandomHamiltonianCircle(int permutations) {
     minPathCost = INT_MAX;
 
     std::vector<int> nodes(nodesNumber);
+
     std::iota(nodes.begin(), nodes.end(), 0); // Fill nodes with 0, 1, ..., nodesNumber-1
 
     for (int i = 0; i < permutations; ++i) { // Try [n] random permutations
@@ -34,14 +36,14 @@ TSP_Result R::findBestRandomHamiltonianCircle(int permutations) {
             currentCost += matrix[from][to];
         }
 
-        if (validCycle && currentCost < result.minPathCost) {
-            result.minPathCost = currentCost;
-            result.bestPath = nodes;
-            result.bestPath.push_back(nodes[0]);
+        if (validCycle && currentCost < minPathCost) {
+            minPathCost = currentCost;
+            bestPath = nodes;
+            bestPath.push_back(nodes[0]);
         }
     }
 
-    result.bestPath;
+    result.bestPath = bestPath;
 	result.minPathCost = minPathCost;
 
     return result;
@@ -55,9 +57,11 @@ TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, i
     minPathCost = INT_MAX;
 
     std::vector<int> nodes(nodesNumber);
-    std::iota(nodes.begin(), nodes.end(), 0); // Fill nodes with 0, 1, ..., nodesNumber-1
 
-    int maxPermutations = permutations.value_or(std::numeric_limits<int>::max());
+    for (int i = 0; i < nodesNumber; ++i) {
+        nodes[i] = i;
+    }
+    int maxPermutations = permutations.value_or(INT_MAX);
     int totalPermutations = std::min(maxPermutations, static_cast<int>(std::tgamma(nodesNumber + 1))); // n!
 
     for (int i = 0; i < totalPermutations; ++i) { // Try [n] random permutations
@@ -76,18 +80,20 @@ TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, i
             currentCost += matrix[from][to];
         }
 
-        if (validCycle && currentCost < result.minPathCost) {
-            result.minPathCost = currentCost;
-            result.bestPath = nodes;
-            result.bestPath.push_back(nodes[0]);
+        if (validCycle && currentCost < minPathCost) {
+            minPathCost = currentCost;
+            bestPath = nodes;
+            bestPath.push_back(nodes[0]);
         }
 
-        if (result.minPathCost <= knownMinPathCost) {
+        if (minPathCost <= knownMinPathCost) {
             break;
         }
     }
 
     result.minPathCost = minPathCost;
+    result.bestPath = bestPath;
+
 
     return result;
 }

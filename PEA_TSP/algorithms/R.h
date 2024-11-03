@@ -1,9 +1,8 @@
 #pragma once
-
 #include <vector>
+#include <optional>
 #include "../structures/Graph.h"
 #include "../structures/TSP_Result.h"
-#include <optional>
 
 
 class R {
@@ -16,12 +15,7 @@ private:
 
 public:
 	R(Graph graph);
-    TSP_Result findBestRandomHamiltonianCircle();
-    TSP_Result findBestRandomHamiltonianCircle(int known_minPathCost);
-
+    TSP_Result findBestRandomHamiltonianCircle(int permutations);
     TSP_Result findBestRandomHamiltonianCircle(std::optional<int> permutations, int knownMinPathCost);
-
-
-
 };
 

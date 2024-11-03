@@ -39,7 +39,7 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node) {
 
     this->minPathCost = INT_MAX;
     TSP_Result result;
-    std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
+    std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq; //smallest elements will apear on front 
 
     std::vector<int> pom_path;
     int pom_cost;
@@ -73,7 +73,7 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node) {
 
         // Explore the neighbors (next level)
         for (int next_vertex = 0; next_vertex < nodesNumber; ++next_vertex) {
-            // Ignore vertices that are already in the path or have no edge
+			// Ignore vertices that are already in the path or have no edge, find will return current.path.end() if the vertex is not in the path
             if (matrix[current.current_vertex][next_vertex] <= 0 || std::find(current.path.begin(), current.path.end(), next_vertex) != current.path.end()) {
                 continue;
             }
@@ -83,7 +83,9 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node) {
             pom_path = current.path;
             pom_path.push_back(next_vertex);
 
+			// Calculate the lower bound
             pom_bound = pom_cost + lowerBound(pom_path, next_vertex);
+			// If the lower bound is less than the current minimum path cost, add the node to the queue
             if (pom_bound < minPathCost) {
                 pq.push(Node(next_vertex, pom_path, pom_cost, pom_bound, current.level + 1));
             }

@@ -68,7 +68,7 @@ int main(int argslen, char* args[]) {
 
 
         timer.start();
-        result = r.findBestRandomHamiltonianCircle();
+        result = r.findBestRandomHamiltonianCircle(1000);
         timer.stop();
 
         std::cout << "R: Min path cost: " << result.minPathCost << "\n";
