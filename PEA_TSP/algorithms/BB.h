@@ -24,7 +24,9 @@ private:
 public:
     BB(Graph graph);
     TSP_Result findCheapestHamiltonianCircle_DFS(int start_node);
-    TSP_Result findCheapestHamiltonianCircle_BFS(int start_node);
+    TSP_Result findCheapestHamiltonianCircle_CL(int start_node);
+    TSP_Result findCheapestHamiltonianCircle_FILO(int start_node);
+
 };
 
 

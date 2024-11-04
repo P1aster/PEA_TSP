@@ -10,6 +10,8 @@ private:
     std::string inputPath;
     std::string outputPath;
     std::string configFilePath;
+    bool checkAllNodes;
+    std::vector<int> nodeList;
     int repeatNumber = 0;
     int coutFlag = 0;
     std::optional<std::ofstream> outputFileOpt;
@@ -23,6 +25,9 @@ public:
     std::string getOutputPath();
     int getRepeatNumber();
     int getCoutFlag();
+	bool getCheckAllNodes();
+	std::vector<int> getNodeList();
+
     void cout(std::string str);
     bool checkPathIsFile(std::string path);
 

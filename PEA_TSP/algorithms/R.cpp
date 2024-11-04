@@ -58,6 +58,9 @@ TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, i
 
     std::vector<int> nodes(nodesNumber);
 
+	int pom_currentCost = 0;
+	bool pom_validCycle = true;
+
     for (int i = 0; i < nodesNumber; ++i) {
         nodes[i] = i;
     }
@@ -67,21 +70,21 @@ TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, i
     for (int i = 0; i < totalPermutations; ++i) { // Try [n] random permutations
         std::shuffle(nodes.begin(), nodes.end(), g);
 
-        int currentCost = 0;
-        bool validCycle = true;
+        pom_currentCost = 0;
+        pom_validCycle = true;
 
         for (int j = 0; j < nodesNumber; ++j) {
             int from = nodes[j];
             int to = nodes[(j + 1) % nodesNumber];
             if (matrix[from][to] <= 0) {
-                validCycle = false;
+                pom_validCycle = false;
                 break;
             }
-            currentCost += matrix[from][to];
+            pom_currentCost += matrix[from][to];
         }
 
-        if (validCycle && currentCost < minPathCost) {
-            minPathCost = currentCost;
+        if (pom_validCycle && pom_currentCost < minPathCost) {
+            minPathCost = pom_currentCost;
             bestPath = nodes;
             bestPath.push_back(nodes[0]);
         }

@@ -76,8 +76,28 @@ bool Config::readConfig() {
             }
             outputPath = line;
             break;
-        
         case 2:
+            if (line == "all") {
+                checkAllNodes = true;
+            }
+            else {
+                std::istringstream iss(line);
+                std::string token;
+                while (iss >> token) {
+                    try {
+                        int number = std::stoi(token);
+                        nodeList.push_back(number);
+                    }
+                    catch (const std::invalid_argument& error) {
+                        std::cerr << "Invalid argument: could not convert token to int: " << token << std::endl;
+                        return false;
+                    }
+                }
+            }
+            break;
+
+
+        case 3:
             try {
                 repeatNumber = std::stoi(line); // convert string to int
             } catch (const std::invalid_argument& error) {
@@ -85,7 +105,7 @@ bool Config::readConfig() {
                 return false;
             }
             break;
-        case 3:
+        case 4:
             try {
                 coutFlag = std::stoi(line); // convert string to int
             }
@@ -112,6 +132,10 @@ std::string Config::getOutputPath() { return outputPath; }
 int Config::getRepeatNumber() { return repeatNumber; }
 
 int Config::getCoutFlag() { return coutFlag; }
+
+bool Config::getCheckAllNodes() { return checkAllNodes; }
+
+std::vector<int> Config::getNodeList() { return nodeList; }
 
 bool Config::openOutputFile() {
     outputFileOpt.emplace(outputPath); // try open file

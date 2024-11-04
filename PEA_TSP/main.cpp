@@ -22,6 +22,8 @@ int main(int argslen, char* args[]) {
     std::string outputPath;
     int repeats;
     bool isFileOpended = false;
+    std::vector<int> nodesList;
+
       
     if (argslen == 1) {
         std::cerr << "No arguments provided." << std::endl;
@@ -34,8 +36,6 @@ int main(int argslen, char* args[]) {
     }
     inputPath = config.getInputPath();
     repeats = config.getRepeatNumber();
-
-
 
     if (config.checkPathIsFile(inputPath)) {
         if (graph.loadFromFile(inputPath)) {
@@ -53,102 +53,41 @@ int main(int argslen, char* args[]) {
             return 1;
         }
 
-    
-
         config.writeToOutputFile("Instance,Brute force algorithm\n");
         config.writeToOutputFile("Input Path," + inputPath + "\n");
         config.writeToOutputFile("Nodes Number," + std::to_string(graph.getNodesNumber()) + "\n");
         config.writeToOutputFile("Time,[ms]\n");
 
 
-        BB bb(graph);
-        BF bf(graph);
-		RNN rnn(graph);
-        R r(graph);
+       BB bb(graph);
+       BF bf(graph);
+       RNN rnn(graph);
+       R r(graph);
 
-
-        timer.start();
-        result = r.findBestRandomHamiltonianCircle(1000);
-        timer.stop();
-
-        std::cout << "R: Min path cost: " << result.minPathCost << "\n";
-        std::cout << "R: Best path: ";
-        std::cout << timer.getElapsedTime() << " ms\n";
-        for (int i = 0; i < result.bestPath.size(); i++) {
-            std::cout << result.bestPath[i] << " ";
+        if (config.getCheckAllNodes()) {
+            int nodesNumber = graph.getNodesNumber();
+            nodesList = std::vector<int>(nodesNumber);
+            for (int i = 0; i < nodesNumber; ++i) {
+                nodesList[i] = i;
+            }
         }
-        std::cout << "\n\n";
-
-
-
-
-        timer.start();
-        result = bf.findCheapestHamiltonianCircle(0);
-        timer.stop();
-
-        std::cout << "BF: Min path cost: " << result.minPathCost << "\n";
-        std::cout << "BF: Best path: ";
-        std::cout << timer.getElapsedTime() << " ms\n";
-        for (int i = 0; i < result.bestPath.size(); i++) {
-            std::cout << result.bestPath[i] << " ";
+        else {
+            nodesList = config.getNodeList();
         }
-        std::cout << "\n\n";
 
-
-        timer.start();
-        result = rnn.findNearestNaighbour(0);
-        timer.stop();
-
-        std::cout << "NN: Min path cost: " << result.minPathCost << "\n";
-        std::cout << "NN: Best path: ";
-        std::cout << timer.getElapsedTime() << " ms\n";
-        for (int i = 0; i < result.bestPath.size(); i++) {
-            std::cout << result.bestPath[i] << " ";
-        }
-        std::cout << "\n\n";
-
-
-        timer.start();
-        result = rnn.findRepeatedNearestNaighbour();
-        timer.stop();
-
-        std::cout << "RNN: Min path cost: " << result.minPathCost << "\n";
-        std::cout << "RNN: Best path: ";
-        std::cout << timer.getElapsedTime() << " ms\n";
-        for (int i = 0; i < result.bestPath.size(); i++) {
-            std::cout << result.bestPath[i] << " ";
-        }
-        std::cout << "\n\n";
-
-
-
-        for (int i = 0; i < 6; i++) {
-
+        for (int node : nodesList) {
             timer.start();
-            result = bb.findCheapestHamiltonianCircle_BFS(i);
+            result = bb.findCheapestHamiltonianCircle_FIFO(node);
             timer.stop();
 
-            std::cout << "BB_BFS: Min path cost: " << result.minPathCost << "\n";
-            std::cout << "BB_BFS: Best path: ";
+            std::cout << "BB_FIFO: Min path cost: " << result.minPathCost << "\n";
+            std::cout << "BB_FIFO: Best path: ";
             std::cout << timer.getElapsedTime() << " ms\n";
             for (int i = 0; i < result.bestPath.size(); i++) {
                 std::cout << result.bestPath[i] << " ";
             }
             std::cout << "\n\n";
         }
-
-
-      /*  for (int i = 0; i < repeats; i++) {
-
-            config.cout("Processing instance: " + std::to_string(i + 1) + " [begin] \n");
-
-            timer.start();
-            result = bf.findCheapestHamiltonianCircle(0);
-            timer.stop();
-            config.writeToOutputFile(std::to_string(i+1)+ "," + std::to_string(timer.getElapsedTime()) + "\n");
-
-            config.cout("Processing instance: " + std::to_string(i + 1) + " [end] \n");
-        }*/
 
         std::cout << std::endl;
     }
@@ -183,20 +122,32 @@ int main(int argslen, char* args[]) {
                 config.writeToOutputFile("Nodes Number," + std::to_string(graph.getNodesNumber()) + "\n");
                 config.writeToOutputFile("Time,[ms]\n");
 
+                if (config.getCheckAllNodes()) {
+                    int nodesNumber = graph.getNodesNumber();
+                    nodesList = std::vector<int>(nodesNumber);
+                    for (int i = 0; i < nodesNumber; ++i) {
+                        nodesList[i] = i;
+                    }
+                }
+                else {
+                    nodesList = config.getNodeList();
+                }
 
-                for (int i = 0; i < repeats; i++) {
 
-                    config.cout("Processing instance: " + std::to_string(i + 1) + " [begin] \n");
-
+                for (int node : nodesList) {
                     timer.start();
-                    result = bf.findCheapestHamiltonianCircle(0);
+                    result = bf.findCheapestHamiltonianCircle(node);
                     timer.stop();
 
-                    config.writeToOutputFile(std::to_string(i + 1) + "," + std::to_string(timer.getElapsedTime()) + "\n");
-
-                    config.cout("Processing instance: " + std::to_string(i + 1) + " [end] \n");
-
+                    std::cout << "BB_BFS: Min path cost: " << result.minPathCost << "\n";
+                    std::cout << "BB_BFS: Best path: ";
+                    std::cout << timer.getElapsedTime() << " ms\n";
+                    for (int i = 0; i < result.bestPath.size(); i++) {
+                        std::cout << result.bestPath[i] << " ";
+                    }
+                    std::cout << "\n\n";
                 }
+
 
                 config.writeToOutputFile("\n\n");
             }

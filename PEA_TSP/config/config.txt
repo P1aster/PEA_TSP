@@ -1,4 +1,5 @@
 ./data/matrix_11.txt
 ./output/output.txt
+all
 1
 1
