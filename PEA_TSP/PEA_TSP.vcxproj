@@ -87,9 +87,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BNN</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -110,9 +112,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BNN</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -126,6 +130,7 @@
     <ClCompile Include="algorithms\BF.cpp" />
     <ClCompile Include="algorithms\R.cpp" />
     <ClCompile Include="algorithms\RNN.cpp" />
+    <ClCompile Include="ErrorCalculator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="structures\Graph.cpp" />
     <ClCompile Include="utils\Config.cpp" />
@@ -136,6 +141,7 @@
     <ClInclude Include="algorithms\BF.h" />
     <ClInclude Include="algorithms\R.h" />
     <ClInclude Include="algorithms\RNN.h" />
+    <ClInclude Include="ErrorCalculator.h" />
     <ClInclude Include="structures\Graph.h" />
     <ClInclude Include="structures\Node.h" />
     <ClInclude Include="structures\TSP_Result.h" />

@@ -1,5 +1,5 @@
-./data/matrix_10.txt
-./output/output.txt
+./data/data6.txt
+./output/output.csv
+1
+10
 0
-1
-1

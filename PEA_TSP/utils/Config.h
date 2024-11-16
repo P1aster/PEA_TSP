@@ -4,6 +4,14 @@
 #include <filesystem>
 #include <fstream>
 #include <optional>
+#include "../structures/Graph.h"
+
+
+
+struct ProcessFileResult {
+    std::vector<int> nodesList;
+    int knownMinPathCost;
+};
 
 class Config {
 private:
@@ -19,6 +27,7 @@ private:
     bool createPath(std::string path);
 
 public:
+
     Config(std::string configFilePath);
     bool readConfig();
     std::string getInputPath();
@@ -34,4 +43,8 @@ public:
     bool openOutputFile();
     void writeToOutputFile(const std::string& content);
     void closeOutputFile();
+
+   
+
+    ProcessFileResult preprocessOutputFile(const std::string& filePath, Graph& graph);
 };

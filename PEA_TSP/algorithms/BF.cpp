@@ -31,7 +31,7 @@ void BF::req_findCheapestHamiltonianCircle(std::vector<int>path, std::vector<boo
     int newCost = 0;
 
     if (path.size() == nodesNumber) {
-        if (matrix[path.back()][path[0]] > 0) {
+        if (matrix[path.back()][path[0]] != -1) {
             int totalCost = currentCost + matrix[path.back()][path[0]];
             if (totalCost < minPathCost) {
                 minPathCost = totalCost;
@@ -43,6 +43,7 @@ void BF::req_findCheapestHamiltonianCircle(std::vector<int>path, std::vector<boo
     }
 
 
+
     for (int next = 0; next < nodesNumber; ++next) {
         if (!visited[next] && matrix[current][next] > 0) {
             newCost = currentCost + matrix[current][next];
@@ -52,9 +53,7 @@ void BF::req_findCheapestHamiltonianCircle(std::vector<int>path, std::vector<boo
 
             visited[next] = true;
             path.push_back(next);
-
             req_findCheapestHamiltonianCircle(path, visited, next, newCost);
-
             path.pop_back(); 
             visited[next] = false; 
         }

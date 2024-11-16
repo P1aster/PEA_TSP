@@ -73,7 +73,7 @@ bool Graph::loadFromFile(std::string filename) {
         try {
             nodesNumber = std::stoi(token);
         }
-        catch (const std::invalid_argument& error) {
+        catch (const std::invalid_argument& ) {
             std::cerr << "Error: could`n parse to int" << token << std::endl;
             return false;
         }
@@ -87,7 +87,7 @@ bool Graph::loadFromFile(std::string filename) {
         try {
             knownMinPathCost = std::stoi(token);
         }
-        catch (const std::invalid_argument& error) {
+        catch (const std::invalid_argument& ) {
             std::cerr << "Error: could`n parse to int" << token << std::endl;
             return false;
         }

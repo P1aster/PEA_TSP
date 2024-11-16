@@ -20,7 +20,6 @@ bool Config::checkPathIsFile(std::string path) {
     return false;
 }
 
-
 bool Config::createPath(std::string path) {
     try {
         // Create directories if they don't exist
@@ -123,17 +122,11 @@ bool Config::readConfig() {
     return true;
 }
 
-
 std::string Config::getInputPath() { return inputPath; }
-
 std::string Config::getOutputPath() { return outputPath; }
-
 int Config::getRepeatNumber() { return repeatNumber; }
-
 int Config::getCoutFlag() { return coutFlag; }
-
 bool Config::getCheckAllNodes() { return checkAllNodes; }
-
 std::vector<int> Config::getNodeList() { return nodeList; }
 
 bool Config::openOutputFile() {
@@ -144,7 +137,6 @@ bool Config::openOutputFile() {
         return false;
     }
 }
-
 void Config::writeToOutputFile(const std::string& content) {
     if (outputFileOpt && outputFileOpt->is_open()) {
         *outputFileOpt << content;
@@ -153,15 +145,59 @@ void Config::writeToOutputFile(const std::string& content) {
         std::cerr << "Output file is not open." << std::endl;
     }
 }
-
 void Config::closeOutputFile() {
     if (outputFileOpt && outputFileOpt->is_open()) {
         outputFileOpt->close();
     }
 }
-
 void Config::cout(std::string str) {
     if (coutFlag == 1) {
         std::cout << str;
     }
 }
+
+
+ProcessFileResult Config::preprocessOutputFile(const std::string& filePath, Graph& graph) {
+    ProcessFileResult result;
+
+    if (graph.loadFromFile(filePath)) {
+        std::cout << "Loaded graph from file: " << filePath << "\n\n";
+        graph.printMatrix();
+        std::cout << std::endl;
+    }
+    else {
+        std::cerr << "Failed to load graph from file: " << filePath << std::endl;
+        return result;
+    }
+
+    result.knownMinPathCost = graph.getKnownMinPathCost();
+    std::vector<int> nodesList;
+
+    this->writeToOutputFile("Input Path," + filePath + "\n");
+    this->writeToOutputFile("Nodes Number," + std::to_string(graph.getNodesNumber()) + "\n");
+    this->writeToOutputFile("Min path cost,");
+
+    if (result.knownMinPathCost != INT_MAX) {
+        this->writeToOutputFile(std::to_string(result.knownMinPathCost));
+    }
+
+    this->writeToOutputFile("\nStartNode");
+    for (int repeat = 0; repeat < repeatNumber; repeat++) {
+        this->writeToOutputFile(",repeat " + std::to_string(repeat + 1));
+    }
+    this->writeToOutputFile(",Avg Time, Avg Absolute Err, Avg Relative Err\n");
+
+    if (checkAllNodes) {
+        int nodesNumber = graph.getNodesNumber();
+        result.nodesList = std::vector<int>(nodesNumber);
+        for (int i = 0; i < nodesNumber; ++i) {
+            result.nodesList[i] = i;
+        }
+    }
+    else {
+        result.nodesList = nodeList;
+    }
+
+    return result;
+}
+

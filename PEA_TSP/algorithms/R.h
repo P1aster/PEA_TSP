@@ -4,7 +4,6 @@
 #include "../structures/Graph.h"
 #include "../structures/TSP_Result.h"
 
-
 class R {
 private:
     int nodesNumber;

@@ -1,0 +1,5 @@
+Instance,NN
+Input Path,./data/data6.txt
+Nodes Number,6
+Min path cost,
+StartNode,repeat 1,repeat 2,repeat 3,repeat 4,repeat 5,repeat 6,repeat 7,repeat 8,repeat 9,repeat 10,Avg Time, Avg Absolute Err, Avg Relative Err

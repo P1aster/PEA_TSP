@@ -1,4 +1,0 @@
-Instance,Brute force algorithm
-Input Path,./data/matrix_10.txt
-Nodes Number,10
-Time,[ms]

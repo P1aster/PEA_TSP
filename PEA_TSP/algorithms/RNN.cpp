@@ -130,8 +130,10 @@ void RNN::req_findNearestNaighbour(std::vector<int> path, std::vector<bool>visit
     }
 
     for (int next = 0; next < nodesNumber; next++) {
-        if (matrix[current][next] != -1 && matrix[current][next] < bestNextCost && !visited[next]) {
-            bestNextCost = matrix[current][next];
+        int nextCost = matrix[current][next];
+
+        if (nextCost != -1 && nextCost < bestNextCost && !visited[next]) {
+            bestNextCost = nextCost;
             bestNextNode = next;
         }
     }
@@ -162,13 +164,14 @@ void RNN::req_findBestNearestNaighbour(std::vector<int> path, std::vector<bool>v
     std::vector<int> bestNextNodes;
 
     for (int next = 0; next < nodesNumber; next++) {
-        if (matrix[current][next] != -1 && !visited[next]) {
-            if (matrix[current][next] < bestNextCost) {
-                bestNextCost = matrix[current][next];
+        if (!visited[next] && matrix[current][next] != -1) {
+			int nextCost = matrix[current][next];
+            if (nextCost < bestNextCost) {
+                bestNextCost = nextCost;
                 bestNextNodes.clear();
                 bestNextNodes.push_back(next);
             }
-            else if (matrix[current][next] == bestNextCost) {
+            else if (nextCost == bestNextCost) {
                 bestNextNodes.push_back(next);
             }
         }
