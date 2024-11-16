@@ -11,7 +11,7 @@
 ### 1.1 Config file:
 
 > Config file should contain info about input file or dir path ( if need test more than one instance ), output file path and valid JSON line. JSON line can contains elements like:
-> {"checkAllNodes": `bolean`, "permutations": `int`, "maxDuration": `int`, "repeatNumber": `int`, "print": `bool`}
+> {"checkAllNodes": `bolean`, nodesList: `int[]` "permutations": `int`, "maxDuration": `int`, "repeatNumber": `int`, "print": `bool`}
  
 
 ##### Example config file.
