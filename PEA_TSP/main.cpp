@@ -8,11 +8,6 @@
 #include "structures/Graph.h"
 #include <queue>
 
-
-
-
-
-
 int main(int argslen, char* args[]) {
     Graph graph;
 
@@ -64,6 +59,8 @@ int main(int argslen, char* args[]) {
        RNN rnn(graph);
        R r(graph);
 
+       std::cout << "\n" << "KNOWN_MIN_PATH_COST: " << graph.getKnownMinPathCost() << "\n";
+
         if (config.getCheckAllNodes()) {
             int nodesNumber = graph.getNodesNumber();
             nodesList = std::vector<int>(nodesNumber);
@@ -75,19 +72,125 @@ int main(int argslen, char* args[]) {
             nodesList = config.getNodeList();
         }
 
+   //     for (int node : nodesList) {
+   //         timer.start();
+			//result = rnn.findNearestNaighbour(node);
+   //         timer.stop();
+   //         std::cout << "NN" << "\n";
+   //         std::cout << "Min path cost: " << result.minPathCost << "\n";
+   //         std::cout << "Best path: ";
+   //         std::cout << timer.getElapsedTime() << " ms\n";
+   //         for (int i = 0; i < result.bestPath.size(); i++) {
+   //             std::cout << result.bestPath[i] << " ";
+   //         }
+   //         std::cout << "\n\n";
+   //     }
+
+   //     for (int node : nodesList) {
+   //         timer.start();
+   //         result = rnn.findBestNearestNeighbour(node);
+   //         timer.stop();
+   //         std::cout << "BNN" << "\n";
+   //         std::cout << "Min path cost: " << result.minPathCost << "\n";
+   //         std::cout << "Best path: ";
+   //         std::cout << timer.getElapsedTime() << " ms\n";
+   //         for (int i = 0; i < result.bestPath.size(); i++) {
+   //             std::cout << result.bestPath[i] << " ";
+   //         }
+   //         std::cout << "\n\n";
+   //     }
+
+   //     timer.start();
+   //     result = rnn.findRepeatedNearestNaighbour();
+   //     timer.stop();
+   //     std::cout << "RNN" << "\n";
+   //     std::cout << "Min path cost: " << result.minPathCost << "\n";
+   //     std::cout << "Best path: ";
+   //     std::cout << timer.getElapsedTime() << " ms\n";
+   //     for (int i = 0; i < result.bestPath.size(); i++) {
+   //         std::cout << result.bestPath[i] << " ";
+   //     }
+   //     std::cout << "\n\n";
+
+        timer.start();
+        result = rnn.findBestRepeatedNearestNeighbour();
+        timer.stop();
+        std::cout << "BRNN" << "\n";
+        std::cout << "Min path cost: " << result.minPathCost << "\n";
+        std::cout << "Best path: ";
+        std::cout << timer.getElapsedTime() << " ms\n";
+        for (int i = 0; i < result.bestPath.size(); i++) {
+            std::cout << result.bestPath[i] << " ";
+        }
+        std::cout << "\n\n";
+
+        /*for (int node : nodesList) {
+            timer.start();
+            result = r.findBestRandomHamiltonianCircle(std::nullopt, 195);
+            timer.stop();
+            std::cout << "R" << "\n";
+            std::cout << "Min path cost: " << result.minPathCost << "\n";
+            std::cout << "Best path: ";
+            std::cout << timer.getElapsedTime() << " ms\n";
+            for (int i = 0; i < result.bestPath.size(); i++) {
+                std::cout << result.bestPath[i] << " ";
+            }
+            std::cout << "\n\n";
+        }*/
+        /*for (int node : nodesList) {
+            timer.start();
+            result = bf.findCheapestHamiltonianCircle(node);
+            timer.stop();
+            std::cout << "BF" << "\n";
+            std::cout << "Min path cost: " << result.minPathCost << "\n";
+            std::cout << "Best path: ";
+            std::cout << timer.getElapsedTime() << " ms\n";
+            for (int i = 0; i < result.bestPath.size(); i++) {
+                std::cout << result.bestPath[i] << " ";
+            }
+            std::cout << "\n\n";
+        }*/
+        /*for (int node : nodesList) {
+            timer.start();
+            result = bb.findCheapestHamiltonianCircle_BFS(node, 209);
+            timer.stop();
+            std::cout << "BFS" << "\n";
+            std::cout << "Min path cost: " << result.minPathCost << "\n";
+            std::cout << "Best path: ";
+            std::cout << timer.getElapsedTime() << " ms\n";
+            for (int i = 0; i < result.bestPath.size(); i++) {
+                std::cout << result.bestPath[i] << " ";
+            }
+            std::cout << "\n\n";
+        }*/
         for (int node : nodesList) {
             timer.start();
-            result = bb.findCheapestHamiltonianCircle_FIFO(node);
+            result = bb.findCheapestHamiltonianCircle_DFS(node, 67);
             timer.stop();
-
-            std::cout << "BB_FIFO: Min path cost: " << result.minPathCost << "\n";
-            std::cout << "BB_FIFO: Best path: ";
+            std::cout << "DFS" << "\n";
+            std::cout << "Min path cost: " << result.minPathCost << "\n";
+            std::cout << "Best path: ";
             std::cout << timer.getElapsedTime() << " ms\n";
             for (int i = 0; i < result.bestPath.size(); i++) {
                 std::cout << result.bestPath[i] << " ";
             }
             std::cout << "\n\n";
         }
+        for (int node : nodesList) {
+            timer.start();
+            result = bb.findCheapestHamiltonianCircle_LC(node, 67);
+            timer.stop();
+            std::cout << "LC" << "\n";
+            std::cout << "Min path cost: " << result.minPathCost << "\n";
+            std::cout << "Best path: ";
+            std::cout << timer.getElapsedTime() << " ms\n";
+            for (int i = 0; i < result.bestPath.size(); i++) {
+                std::cout << result.bestPath[i] << " ";
+            }
+            std::cout << "\n\n";
+        }
+        
+
 
         std::cout << std::endl;
     }
@@ -116,7 +219,10 @@ int main(int argslen, char* args[]) {
                     std::cerr << "Failed to load graph from file: " << filePath << std::endl;
                     return 1;
                 }
+                BB bb(graph);
                 BF bf(graph);
+                RNN rnn(graph);
+                R r(graph);
 
                 config.writeToOutputFile("Input Path," + filePath + "\n");
                 config.writeToOutputFile("Nodes Number," + std::to_string(graph.getNodesNumber()) + "\n");
@@ -139,8 +245,8 @@ int main(int argslen, char* args[]) {
                     result = bf.findCheapestHamiltonianCircle(node);
                     timer.stop();
 
-                    std::cout << "BB_BFS: Min path cost: " << result.minPathCost << "\n";
-                    std::cout << "BB_BFS: Best path: ";
+                    std::cout << "Min path cost: " << result.minPathCost << "\n";
+                    std::cout << "Best path: ";
                     std::cout << timer.getElapsedTime() << " ms\n";
                     for (int i = 0; i < result.bestPath.size(); i++) {
                         std::cout << result.bestPath[i] << " ";

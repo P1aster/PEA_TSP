@@ -11,5 +11,7 @@ public:
     void start();
     void stop();
     float getElapsedTime();
+    float getElapsedTimeNow();
+
 };
 

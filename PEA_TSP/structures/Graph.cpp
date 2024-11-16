@@ -6,12 +6,21 @@
 #include <string>
 
 Graph::Graph() {
-    nodesNumber = 0;
-    v = nullptr;
+    this->nodesNumber = 0;
+    this->knownMinPathCost = INT_MAX;
+    this->v = nullptr;
 }
 
 int Graph::getNodesNumber() {
     return nodesNumber;
+}
+
+int Graph::getKnownMinPathCost() {
+    return knownMinPathCost;
+}
+
+void Graph::setKnownMinPathCost(int cost) {
+	knownMinPathCost = cost;
 }
 
 int** Graph::getMatrix() {
@@ -44,9 +53,49 @@ bool Graph::loadFromFile(std::string filename) {
 
 
     if (!file) {
+        std::cerr << "Error: Could not read the file" << std::endl;
+
         return false;
     }
-    file >> nodesNumber;
+    std::string line;
+    std::string token;
+
+
+    if (!std::getline(file, line)) {
+        std::cerr << "Error: Could not read the first line from the file" << std::endl;
+        return false;
+    }
+
+    std::istringstream iss(line);
+
+
+    if (iss >> token) {
+        try {
+            nodesNumber = std::stoi(token);
+        }
+        catch (const std::invalid_argument& error) {
+            std::cerr << "Error: could`n parse to int" << token << std::endl;
+            return false;
+        }
+    }
+    else {
+		std::cerr << "Error: Invalid number of nodes" << token << std::endl;
+		return false;
+    }
+
+    if (iss >> token) {
+        try {
+            knownMinPathCost = std::stoi(token);
+        }
+        catch (const std::invalid_argument& error) {
+            std::cerr << "Error: could`n parse to int" << token << std::endl;
+            return false;
+        }
+    }
+    else {
+        knownMinPathCost = INT_MAX;
+    }
+
 
     Graph::v = new int* [nodesNumber];
     for (int i = 0; i < nodesNumber; i++) {

@@ -81,6 +81,7 @@ bool Config::readConfig() {
                 checkAllNodes = true;
             }
             else {
+				checkAllNodes = false;
                 std::istringstream iss(line);
                 std::string token;
                 while (iss >> token) {
@@ -88,19 +89,17 @@ bool Config::readConfig() {
                         int number = std::stoi(token);
                         nodeList.push_back(number);
                     }
-                    catch (const std::invalid_argument& error) {
+                    catch (const std::invalid_argument&) {
                         std::cerr << "Invalid argument: could not convert token to int: " << token << std::endl;
                         return false;
                     }
                 }
             }
             break;
-
-
         case 3:
             try {
-                repeatNumber = std::stoi(line); // convert string to int
-            } catch (const std::invalid_argument& error) {
+                repeatNumber = std::stoi(line);
+            } catch (const std::invalid_argument&) {
                 std::cerr << "Invalid argument: could not convert line to int: " << line << std::endl;
                 return false;
             }
@@ -109,7 +108,7 @@ bool Config::readConfig() {
             try {
                 coutFlag = std::stoi(line); // convert string to int
             }
-            catch (const std::invalid_argument& error) {
+            catch (const std::invalid_argument&) {
                 std::cerr << "Invalid argument: could not convert line to int: " << line << std::endl;
                 return false;
             }

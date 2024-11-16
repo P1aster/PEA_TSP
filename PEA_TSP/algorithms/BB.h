@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "../structures/Graph.h"
 #include "../structures/TSP_Result.h"
+#include <optional>
 
 
 class BB {
@@ -23,8 +24,9 @@ private:
 
 public:
     BB(Graph graph);
-    TSP_Result findCheapestHamiltonianCircle_DFS(int start_node);
-    TSP_Result findCheapestHamiltonianCircle_CL(int start_node);
+    TSP_Result findCheapestHamiltonianCircle_DFS(int start_node, std::optional<int> upper_limit = std::nullopt);
+    TSP_Result findCheapestHamiltonianCircle_LC(int start_node, std::optional<int>upper_limit = std::nullopt);
+    TSP_Result findCheapestHamiltonianCircle_BFS(int start_node, std::optional<int> upper_limit = std::nullopt);
     TSP_Result findCheapestHamiltonianCircle_FILO(int start_node);
 
 };

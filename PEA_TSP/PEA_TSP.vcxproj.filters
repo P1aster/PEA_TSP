@@ -65,7 +65,7 @@
     <ClInclude Include="algorithms\R.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Node.h">
+    <ClInclude Include="structures\Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

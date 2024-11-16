@@ -10,7 +10,7 @@ private:
     std::string inputPath;
     std::string outputPath;
     std::string configFilePath;
-    bool checkAllNodes;
+    bool checkAllNodes = false;
     std::vector<int> nodeList;
     int repeatNumber = 0;
     int coutFlag = 0;
