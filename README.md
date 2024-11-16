@@ -18,8 +18,6 @@
 ```
 ./data/data.txt
 ./output/output.txt
-1 2 3 4 5
-10
-1
+{"checkAllNodes": true, "permutations": 5000, "maxDuration": 600000, "repeatNumber": 10, "print": false}
 ```
 
