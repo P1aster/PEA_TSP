@@ -61,14 +61,12 @@ TSP_Result BB::findCheapestHamiltonianCircle_LC(int start_node, std::optional<in
         Node current = pq.top();
         pq.pop();
 
-
-
         //Check for Hamiltonian Cyrcle
         if (current.level == nodesNumber - 1) {
             int return_cost = matrix[current.current_vertex][start_node];
             if (return_cost != -1) {
                 int final_cost = current.cost + return_cost;
-                if (final_cost < minPathCost) {
+                if (final_cost <= minPathCost) {
                     minPathCost = final_cost;
                     bestPath = current.path;
                     bestPath.push_back(start_node);
@@ -135,7 +133,7 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
         q.pop();
 
         // Check if the current cost exceeds the minimum path cost
-        if (current.cost >= minPathCost) {
+        if (current.cost > minPathCost) {
             continue;
         }
 
@@ -255,7 +253,7 @@ void BB::req_findCheapestHamiltonianCircle(std::vector<int>& path, std::vector<b
     if (path.size() == nodesNumber) {
         if (matrix[path.back()][path[0]] != -1) {
             int totalCost = currentCost + matrix[path.back()][path[0]];
-            if (totalCost < minPathCost) {
+            if (totalCost <= minPathCost) {
                 minPathCost = totalCost;
                 bestPath = path;
                 bestPath.push_back(path[0]);

@@ -1,6 +1,7 @@
 #include "RNN.h"
 
 
+
 RNN::RNN(Graph graph) {
     this->nodesNumber = graph.getNodesNumber();
     this->matrix = graph.getMatrix();

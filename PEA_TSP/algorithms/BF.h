@@ -4,8 +4,6 @@
 #include "../structures/Graph.h"
 #include "../structures/TSP_Result.h"
 
-
-
 // Brute Force
 class BF {
 private:
@@ -19,4 +17,3 @@ public:
     BF(Graph graph);
     TSP_Result findCheapestHamiltonianCircle(int start_node);
 };
-

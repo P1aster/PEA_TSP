@@ -5,100 +5,61 @@
 #include "algorithms/RNN.h"
 #include "utils/Config.h"
 #include "utils/Time.h"
+#include "utils/ErrorCalculator.h"
 #include "structures/Graph.h"
 #include <queue>
-#include "ErrorCalculator.h"
+#include <functional>
 
-void processBFGraph(Graph& graph, Config& config, const std::vector<int>& nodesList, int knownMinPathCost) {
+
+void processGraph(
+    Graph& graph,
+    Config& config,
+    const std::vector<int>& nodesList,
+    std::optional<unsigned int> knownMinPathCost,
+    std::function<TSP_Result()> algorithmFunction,
+    const std::string& algorithmName
+) {
     Time timer;
     ErrorCalculator errorCalculator;
-    BF bf(graph);
     double totalElapsedTime = 0;
     double totalAbsoluteError = 0;
     double totalRelativeErrorPercentage = 0;
     int repeats = config.getRepeatNumber();
-    for (int node : nodesList) {
-        for (int repeat = 0; repeat < repeats; repeat++) {
-            timer.start();
-            TSP_Result result = bf.findCheapestHamiltonianCircle(node);
-            timer.stop();
 
-            config.cout("\n--BF--");
-            if (knownMinPathCost != INT_MAX) {
-                config.cout("\nKnown min path cost: " + knownMinPathCost);
-            }
-            config.cout("\nMin found path cost: " + std::to_string(result.minPathCost));
-            config.cout("\nBest path: \n");
+    TSP_Result bestResult; // Store the best result across all repeats
+    bool firstRun = true;
 
-            for (int i = 0; i < result.bestPath.size(); i++) {
-                int res = result.bestPath[i];
-                config.cout(std::to_string(res) + " ");
-            }
-            float elapsedTime = timer.getElapsedTime();
-            config.cout("\nExecution time: " + std::to_string(elapsedTime) + " ms\n");
-
-            config.writeToOutputFile(std::to_string(elapsedTime) + ",");
-
-            totalElapsedTime += elapsedTime;
-
-            if (knownMinPathCost != INT_MAX) {
-                errorCalculator.setTrueValue(knownMinPathCost);
-                double absoluteError = errorCalculator.calculateAbsoluteError(result.minPathCost);
-                double relativeErrorPercentage = errorCalculator.calculateRelativeError(result.minPathCost);
-                config.cout("\nAbsolute Error: " + std::to_string(absoluteError));
-                config.cout("\nRelative Error: " + std::to_string(relativeErrorPercentage) + "%\n\n");
-
-                totalAbsoluteError += absoluteError;
-                totalRelativeErrorPercentage += relativeErrorPercentage;
-            }
-        }
-    }
-
-    double averageElapsedTime = totalElapsedTime / repeats;
-    double averageAbsoluteError = totalAbsoluteError / repeats;
-    double averageRelativeErrorPercentage = totalRelativeErrorPercentage / repeats;
-
-    config.writeToOutputFile(std::to_string(averageElapsedTime) + ",");
-    config.writeToOutputFile(std::to_string(averageAbsoluteError) + ",");
-    config.writeToOutputFile(std::to_string(averageRelativeErrorPercentage) + "%\n");
-}
-
-void processRNNGraph(Graph& graph, Config& config, const std::vector<int>& nodesList, int knownMinPathCost) {
-    Time timer;
-    ErrorCalculator errorCalculator;
-    RNN rnn(graph);
-    double totalElapsedTime = 0;
-    double totalAbsoluteError = 0;
-    double totalRelativeErrorPercentage = 0;
-	int repeats = config.getRepeatNumber();
-    
     for (int repeat = 0; repeat < repeats; repeat++) {
         timer.start();
-        TSP_Result result = rnn.findRepeatedNearestNaighbour();
+        TSP_Result result = algorithmFunction();
         timer.stop();
 
-        config.cout("\n--NN--");
-        if (knownMinPathCost != INT_MAX) {
-            config.cout("\nKnown min path cost: " + knownMinPathCost);
+        // Update best result if this is the first run or if we found a better path
+        if (firstRun || result.minPathCost < bestResult.minPathCost) {
+            bestResult = result;
+            firstRun = false;
+        }
+
+        config.cout("\n--" + algorithmName + "--");
+        if (knownMinPathCost.has_value()) {
+            config.cout("\nKnown min path cost: " + std::to_string(knownMinPathCost.value()));
         }
         config.cout("\nMin found path cost: " + std::to_string(result.minPathCost));
         config.cout("\nBest path: \n");
-
-        for (int i = 0; i < result.bestPath.size(); i++) {
-            int res = result.bestPath[i];
-            config.cout(std::to_string(res) + " ");
+        for (int node : result.bestPath) {
+            config.cout(std::to_string(node) + " ");
         }
+
         float elapsedTime = timer.getElapsedTime();
         config.cout("\nExecution time: " + std::to_string(elapsedTime) + " ms\n");
-
         config.writeToOutputFile(std::to_string(elapsedTime) + ",");
-
         totalElapsedTime += elapsedTime;
 
-        if (knownMinPathCost != INT_MAX) {
-            errorCalculator.setTrueValue(knownMinPathCost);
+        if (knownMinPathCost.has_value()) {
+            errorCalculator.setTrueValue(knownMinPathCost.value());
             double absoluteError = errorCalculator.calculateAbsoluteError(result.minPathCost);
             double relativeErrorPercentage = errorCalculator.calculateRelativeError(result.minPathCost);
+
             config.cout("\nAbsolute Error: " + std::to_string(absoluteError));
             config.cout("\nRelative Error: " + std::to_string(relativeErrorPercentage) + "%\n\n");
 
@@ -111,17 +72,195 @@ void processRNNGraph(Graph& graph, Config& config, const std::vector<int>& nodes
     double averageAbsoluteError = totalAbsoluteError / repeats;
     double averageRelativeErrorPercentage = totalRelativeErrorPercentage / repeats;
 
+    // Write the final results including the best path cost found
     config.writeToOutputFile(std::to_string(averageElapsedTime) + ",");
+    config.writeToOutputFile(std::to_string(bestResult.minPathCost) + ",");
     config.writeToOutputFile(std::to_string(averageAbsoluteError) + ",");
     config.writeToOutputFile(std::to_string(averageRelativeErrorPercentage) + "%\n");
 }
 
+void processGraphWithStartNodes(
+    Graph& graph,
+    Config& config,
+    const std::vector<int>& nodesList,
+    std::optional<unsigned int> knownMinPathCost,
+    std::function<TSP_Result(int)> algorithmFunction,
+    const std::string& algorithmName
+) {
+    Time timer;
+    ErrorCalculator errorCalculator;
+
+    // For each starting node
+    for (int startNode : nodesList) {
+        double totalElapsedTime = 0;
+        double totalAbsoluteError = 0;
+        double totalRelativeErrorPercentage = 0;
+        TSP_Result bestResult; // Store the best result for this start node
+        bool firstRun = true;
+
+        config.writeToOutputFile(std::to_string(startNode) + ",");
+
+        int repeats = config.getRepeatNumber();
+
+        // Perform repeated measurements for each starting node
+        for (int repeat = 0; repeat < repeats; repeat++) {
+            timer.start();
+            TSP_Result result = algorithmFunction(startNode);
+            timer.stop();
+
+            // Update best result if this is the first run or if we found a better path
+            if (firstRun || result.minPathCost < bestResult.minPathCost) {
+                bestResult = result;
+                firstRun = false;
+            }
+
+            float elapsedTime = timer.getElapsedTime();
+            totalElapsedTime += elapsedTime;
+
+            // Output detailed information only for the first repeat
+            if (repeat == 0) {
+                config.cout("\n--" + algorithmName + " (Start Node: " + std::to_string(startNode) + ")--");
+                if (knownMinPathCost.has_value()) {
+                    config.cout("\nKnown min path cost: " + std::to_string(knownMinPathCost.value()));
+                }
+                config.cout("\nMin found path cost: " + std::to_string(result.minPathCost));
+                config.cout("\nBest path: \n");
+                for (int node : result.bestPath) {
+                    config.cout(std::to_string(node) + " ");
+                }
+                config.cout("\nExecution time: " + std::to_string(elapsedTime) + " ms\n");
+
+            }
+
+            config.writeToOutputFile(std::to_string(elapsedTime) + ",");
+        }
+
+        double averageElapsedTime = totalElapsedTime / repeats;
+
+        // Write the results including the best path cost found for this start node
+        config.writeToOutputFile(std::to_string(averageElapsedTime) + ",");
+        config.writeToOutputFile(std::to_string(bestResult.minPathCost) + ",");
+
+        // Calculate and write error metrics if known min path cost is available
+        if (knownMinPathCost.has_value()) {
+            errorCalculator.setTrueValue(knownMinPathCost.value());
+            double absoluteError = errorCalculator.calculateAbsoluteError(bestResult.minPathCost);
+            double relativeErrorPercentage = errorCalculator.calculateRelativeError(bestResult.minPathCost);
+
+            config.writeToOutputFile(std::to_string(absoluteError) + ",");
+            config.writeToOutputFile(std::to_string(relativeErrorPercentage) + "%");
+        }
+
+        config.writeToOutputFile("\n");
+    }
+}
+void processBF(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    BF bf(graph);
+
+    auto algorithmFunction = [&bf](int startNode) {
+        return bf.findCheapestHamiltonianCircle(startNode);
+        };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BF");
+}
+
+void processRNN(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    RNN rnn(graph);
+
+	config.writeToOutputFile(",");
+    auto algorithmFunction = [&rnn]() {
+        return rnn.findRepeatedNearestNaighbour();
+        };
+
+    processGraph(graph, config, nodesList, knownMinPathCost, algorithmFunction, "RNN");
+}
+
+void processBRNN(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+	RNN rnn(graph);
+	config.writeToOutputFile(",");
+	auto algorithmFunction = [&rnn]() {
+		return rnn.findBestRepeatedNearestNeighbour();
+	};
+	processGraph(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BRNN");
+}
+
+void processR(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<unsigned int> knownMinPathCost, std::optional<unsigned int> permutations, std::optional<unsigned int> maxDuration) {
+    R r(graph);
+
+    config.writeToOutputFile(",");
+    auto algorithmFunction = [&r, permutations, knownMinPathCost, maxDuration]() {
+        return r.findBestRandomHamiltonianCircle(permutations, knownMinPathCost, maxDuration);
+        };
+
+    processGraph(graph, config, nodesList, knownMinPathCost.value_or(INT_MAX), algorithmFunction, "R");
+}
+
+void processBBDFS(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    BB bb(graph);
+
+    auto algorithmFunction = [&bb](int startNode) {
+        return bb.findCheapestHamiltonianCircle_DFS(startNode);
+        };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_DFS");
+}
+
+void processBBLC(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    BB bb(graph);
+
+    auto algorithmFunction = [&bb](int startNode) {
+        return bb.findCheapestHamiltonianCircle_LC(startNode);
+        };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_DFS");
+}
+
+void processBBBFS(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    BB bb(graph);
+
+    auto algorithmFunction = [&bb](int startNode) {
+        return bb.findCheapestHamiltonianCircle_LC(startNode);
+        };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_BFS");
+}
+
+void processBRNNBBDFS(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    BB bb(graph);
+    RNN rnn(graph);
+    auto algorithmFunction = [&bb, &rnn](int startNode) {
+        TSP_Result result = rnn.findBestRepeatedNearestNeighbour();
+        return bb.findCheapestHamiltonianCircle_DFS(startNode, result.minPathCost);
+        };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_DFS");
+}
+
+void processBRNNBBLC(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    BB bb(graph);
+    RNN rnn(graph);
+    auto algorithmFunction = [&bb, &rnn](int startNode) {
+        TSP_Result result = rnn.findBestRepeatedNearestNeighbour();
+        return bb.findCheapestHamiltonianCircle_LC(startNode, result.minPathCost);
+        };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_DFS");
+}
+
+void processBRNNBBBFS(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    BB bb(graph);
+    RNN rnn(graph);
+    auto algorithmFunction = [&bb, &rnn](int startNode) {
+        TSP_Result result = rnn.findBestRepeatedNearestNeighbour();
+        return bb.findCheapestHamiltonianCircle_LC(startNode, result.minPathCost);
+        };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_BFS");
+}
+
+
 int main(int argslen, char* args[]) {
     Graph graph;
-    ProcessFileResult fileRes;
-    std::string inputPath;
-    std::string outputPath;
-    bool isFileOpended = false;
 
     if (argslen == 1) {
         std::cerr << "No arguments provided." << std::endl;
@@ -133,43 +272,67 @@ int main(int argslen, char* args[]) {
         return 1;
     }
 
-    inputPath = config.getInputPath();
+    std::string filePath = config.getInputPath();
 
-    if (config.checkPathIsFile(inputPath)) {
-
-        isFileOpended = config.openOutputFile();
-        if (!isFileOpended) {
-            std::cerr << "Failed to open output file: " << outputPath << std::endl;
-            return 1;
-        }
-
-        fileRes = config.preprocessOutputFile(inputPath, graph);
-
-        #ifdef NN
-            processRNNGraph(graph, config, fileRes.nodesList, fileRes.knownMinPathCost);
-        #elif BNN
-            std::cout << "JD!" << std::endl;
-        #else
-            std::cout << "No function is defined to call!" << std::endl;
-        #endif
-
+    if (graph.loadFromFile(filePath)) {
+        std::cout << "Loaded graph from file: " << filePath << "\n\n";
+        graph.printMatrix();
+        std::cout << std::endl;
     }
     else {
-        isFileOpended = config.openOutputFile();
-        if (!isFileOpended) {
-            std::cerr << "Failed to open output file: " << outputPath << std::endl;
-            return 1;
-        }
-
-        for (const auto& entry : std::filesystem::directory_iterator(inputPath)) {
-            if (entry.is_regular_file()) {
-                std::string filePath = entry.path().string();
-                std::cout << "Processing file: " << filePath << std::endl;
-
-
-
-            }
-        }
+        std::cerr << "Failed to load graph from file: " << filePath << std::endl;
     }
+
+    int nodesNumber = graph.getNodesNumber();
+    std::optional<int> knownMinPathCost = config.getKnownMinPathCost();
+	std::optional<int> permutations = config.getPermutations();
+	std::optional<int> maxDuration = config.getMaxDuration();
+
+    std::vector<int> nodesList;
+
+    if (config.getCheckAllNodes()) {
+        nodesList = std::vector<int>(nodesNumber);
+        for (int i = 0; i < nodesNumber; ++i) {
+            nodesList[i] = i;
+        }
+    } else {
+		nodesList = config.getNodeList();
+    }
+
+
+    if (!config.openOutputFile()) {
+		std::cerr << "Failed to open output file." << std::endl;
+		return 1;
+    }
+
+    config.preprocessOutputFile(knownMinPathCost, nodesNumber);
+
+
+    #ifdef BUILD_BF
+        processBF(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_RNN)
+        processRNN(graph, config, nodesList, knownMinPathCost);
+    #elif defined(processBRNN)
+	    processBRNN(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_R)
+	    processR(graph, config, nodesList, knownMinPathCost, permutations, maxDuration);
+    #elif defined(BUILD_BB_DFS)
+	    processBBDFS(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_BB_LC)
+	    processBBLC(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_BB_BFS)
+        processBBBFS(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_BRNN_BB_DFS)
+        processBRNNBBDFS(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_BRNN_BB_LC)
+        processBRNNBBLC(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_BRNN_BB_BFS)
+        processBRNNBBBFS(graph, config, nodesList, knownMinPathCost);
+    #else
+        std::cout << "No function is defined to call!" << std::endl;
+        return 1;
+    #endif
+
+	config.closeOutputFile();
     return 0;
 }

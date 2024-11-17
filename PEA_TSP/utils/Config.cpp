@@ -1,5 +1,7 @@
 #include "Config.h"
 #include <filesystem>
+#include <nlohmann/json.hpp>
+
 
 Config::Config(std::string configFilePath) {
     this->configFilePath = configFilePath;
@@ -7,14 +9,7 @@ Config::Config(std::string configFilePath) {
 }
 
 bool Config::ensureExists(std::string path) {
-    if (std::filesystem::exists(path)) {
-        return true;
-    }
-    return false;
-}
-
-bool Config::checkPathIsFile(std::string path) {
-    if (std::filesystem::is_regular_file(path)) {
+    if (std::filesystem::exists(path) && std::filesystem::is_regular_file(path)) {
         return true;
     }
     return false;
@@ -76,39 +71,39 @@ bool Config::readConfig() {
             outputPath = line;
             break;
         case 2:
-            if (line == "all") {
-                checkAllNodes = true;
-            }
-            else {
-				checkAllNodes = false;
-                std::istringstream iss(line);
-                std::string token;
-                while (iss >> token) {
-                    try {
-                        int number = std::stoi(token);
-                        nodeList.push_back(number);
+
+            try {
+                if (line.front() == '{' && line.back() == '}') {
+                    nlohmann::json jsonObject = nlohmann::json::parse(line);
+                    if (jsonObject.contains("checkAllNodes")) {
+                        checkAllNodes = jsonObject["checkAllNodes"];
                     }
-                    catch (const std::invalid_argument&) {
-                        std::cerr << "Invalid argument: could not convert token to int: " << token << std::endl;
-                        return false;
+                    if (jsonObject.contains("nodeList")) {
+                        nodeList = jsonObject["nodeList"].get<std::vector<int>>();
                     }
+                    if (jsonObject.contains("knownMinPathCost")) {
+                        knownMinPathCost = jsonObject["knownMinPathCost"];
+                    }
+                    if (jsonObject.contains("permutations")) {
+                        permutations = jsonObject["permutations"];
+                    }
+                    if (jsonObject.contains("maxDuration")) {
+                        maxDuration = jsonObject["maxDuration"];
+                    }
+                    if (jsonObject.contains("repeatNumber")) {
+                        repeatNumber = jsonObject["repeatNumber"];
+                    }
+					if (jsonObject.contains("print")) {
+						coutFlag = jsonObject["print"].get<bool>();
+					}
+                }
+                else {
+                    std::cerr << "Line is not in JSON format: " << line << std::endl;
+                    return false;
                 }
             }
-            break;
-        case 3:
-            try {
-                repeatNumber = std::stoi(line);
-            } catch (const std::invalid_argument&) {
-                std::cerr << "Invalid argument: could not convert line to int: " << line << std::endl;
-                return false;
-            }
-            break;
-        case 4:
-            try {
-                coutFlag = std::stoi(line); // convert string to int
-            }
-            catch (const std::invalid_argument&) {
-                std::cerr << "Invalid argument: could not convert line to int: " << line << std::endl;
+            catch (nlohmann::json::parse_error& e) {
+                std::cerr << "JSON Parse Error: " << e.what() << std::endl;
                 return false;
             }
             break;
@@ -124,80 +119,58 @@ bool Config::readConfig() {
 
 std::string Config::getInputPath() { return inputPath; }
 std::string Config::getOutputPath() { return outputPath; }
-int Config::getRepeatNumber() { return repeatNumber; }
-int Config::getCoutFlag() { return coutFlag; }
-bool Config::getCheckAllNodes() { return checkAllNodes; }
+int Config::getRepeatNumber() { return repeatNumber; };
+bool Config::getCoutFlag() { return coutFlag; };
+std::optional<int> Config::getKnownMinPathCost() { return knownMinPathCost; };
+std::optional<int> Config::getPermutations() { return permutations; };
+std::optional<int> Config::getMaxDuration() { return maxDuration; };
+bool Config::getCheckAllNodes() { return checkAllNodes; };
 std::vector<int> Config::getNodeList() { return nodeList; }
 
 bool Config::openOutputFile() {
-    outputFileOpt.emplace(outputPath); // try open file
-    if (outputFileOpt->is_open()) {
+    outputFile.open(outputPath); // try open file
+    if (outputFile.is_open()) {
         return true;
     } else {
         return false;
     }
 }
 void Config::writeToOutputFile(const std::string& content) {
-    if (outputFileOpt && outputFileOpt->is_open()) {
-        *outputFileOpt << content;
+    if (outputFile.is_open()) {
+        outputFile << content;
     }
     else {
         std::cerr << "Output file is not open." << std::endl;
     }
 }
 void Config::closeOutputFile() {
-    if (outputFileOpt && outputFileOpt->is_open()) {
-        outputFileOpt->close();
+    if (outputFile.is_open()) {
+        outputFile.close();
     }
 }
 void Config::cout(std::string str) {
-    if (coutFlag == 1) {
+    if (coutFlag) {
         std::cout << str;
     }
-}
+};
 
 
-ProcessFileResult Config::preprocessOutputFile(const std::string& filePath, Graph& graph) {
-    ProcessFileResult result;
+void Config::preprocessOutputFile(std::optional<int> knownMinPathCost, int nodesNumber) {
 
-    if (graph.loadFromFile(filePath)) {
-        std::cout << "Loaded graph from file: " << filePath << "\n\n";
-        graph.printMatrix();
-        std::cout << std::endl;
-    }
-    else {
-        std::cerr << "Failed to load graph from file: " << filePath << std::endl;
-        return result;
-    }
-
-    result.knownMinPathCost = graph.getKnownMinPathCost();
-    std::vector<int> nodesList;
-
-    this->writeToOutputFile("Input Path," + filePath + "\n");
-    this->writeToOutputFile("Nodes Number," + std::to_string(graph.getNodesNumber()) + "\n");
+    this->writeToOutputFile("Input Path," + inputPath + "\n");
+    this->writeToOutputFile("Nodes Number," + std::to_string(nodesNumber) + "\n");
     this->writeToOutputFile("Min path cost,");
 
-    if (result.knownMinPathCost != INT_MAX) {
-        this->writeToOutputFile(std::to_string(result.knownMinPathCost));
+    if (knownMinPathCost.has_value()) {
+        this->writeToOutputFile(std::to_string(knownMinPathCost.value()));
     }
+    
 
     this->writeToOutputFile("\nStartNode");
     for (int repeat = 0; repeat < repeatNumber; repeat++) {
         this->writeToOutputFile(",repeat " + std::to_string(repeat + 1));
     }
-    this->writeToOutputFile(",Avg Time, Avg Absolute Err, Avg Relative Err\n");
+    this->writeToOutputFile(",Avg Time, Best Result, Avg Absolute Err, Avg Relative Err\n");
 
-    if (checkAllNodes) {
-        int nodesNumber = graph.getNodesNumber();
-        result.nodesList = std::vector<int>(nodesNumber);
-        for (int i = 0; i < nodesNumber; ++i) {
-            result.nodesList[i] = i;
-        }
-    }
-    else {
-        result.nodesList = nodeList;
-    }
-
-    return result;
 }
 

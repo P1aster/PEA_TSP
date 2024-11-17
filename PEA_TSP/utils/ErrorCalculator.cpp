@@ -1,5 +1,5 @@
-#include "utils/ErrorCalculator.h"
-#include <cmath>
+#include "ErrorCalculator.h"
+#include <cmath> // Include cmath for std::abs
 
 ErrorCalculator::ErrorCalculator(std::optional<double> trueValue) {
 	this->trueValue = trueValue.value_or(0.0);
