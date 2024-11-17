@@ -22,7 +22,6 @@ private:
     void findCheapest();
     int lowerBound(std::vector<int>& path, int current_node);
     int lowerBound(std::vector<bool>& visited, int current_node);
-	bool isSymetric();
     void req_findCheapestHamiltonianCircle(std::vector<int>& currentPath, std::vector<bool>& visited, int current, int currentCost);
 public:
     BB(Graph graph);

@@ -36,7 +36,6 @@ TSP_Result BB::findCheapestHamiltonianCircle_DFS(int start_node, std::optional<i
     return result;
 }
 TSP_Result BB::findCheapestHamiltonianCircle_LC(int start_node, std::optional<int> upper_limit) {
-
     if (start_node > nodesNumber - 1 || start_node < 0) {
         throw std::invalid_argument("Invalid start node");
     }
@@ -44,7 +43,6 @@ TSP_Result BB::findCheapestHamiltonianCircle_LC(int start_node, std::optional<in
     this->minPathCost = upper_limit.value_or(INT_MAX);
     TSP_Result result;
     std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq; //smallest elements will apear on front 
-    bool symmetric = isSymetric();
 
     std::vector<int> pom_path;
     int pom_cost;
@@ -61,6 +59,10 @@ TSP_Result BB::findCheapestHamiltonianCircle_LC(int start_node, std::optional<in
         Node current = pq.top();
         pq.pop();
 
+        if (current.lower_bound > minPathCost) {
+            continue;
+        }
+
         //Check for Hamiltonian Cyrcle
         if (current.level == nodesNumber - 1) {
             int return_cost = matrix[current.current_vertex][start_node];
@@ -75,25 +77,30 @@ TSP_Result BB::findCheapestHamiltonianCircle_LC(int start_node, std::optional<in
             continue;
         }
 
+        std::vector<bool> visited(nodesNumber, false);
+        for (int node : current.path) {
+            visited[node] = true;
+        }
+
         // Explore the neighbors (next level)
         for (int next_vertex = 0; next_vertex < nodesNumber; ++next_vertex) {
-			
-            if (symmetric && current.level == 1 && next_vertex > start_node) {
-                continue;
-            }
 
-            // Ignore vertices that are already in the path or have no edge, find will return current.path.end() if the vertex is not in the path
-            if (matrix[current.current_vertex][next_vertex] == -1 || std::find(current.path.begin(), current.path.end(), next_vertex) != current.path.end()) {
+            if (matrix[current.current_vertex][next_vertex] == -1 || visited[next_vertex]) {
                 continue;
             }
 
             // Calculate new cost and lower bound
             pom_cost = current.cost + matrix[current.current_vertex][next_vertex];
+
+            if (pom_cost > minPathCost) {
+                continue;
+            }
+
             pom_path = current.path;
             pom_path.push_back(next_vertex);
 
 			// Calculate the lower bound
-            pom_bound = pom_cost + lowerBound(pom_path, next_vertex);
+            pom_bound = pom_cost + lowerBound(visited, next_vertex);
 			// If the lower bound is less than the current minimum path cost, add the node to the queue
             if (pom_bound < minPathCost) {
                 pq.push(Node(next_vertex, pom_path, pom_cost, pom_bound, current.level + 1));
@@ -117,14 +124,14 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
     TSP_Result result;
     std::queue<Node> q;
 
-    bool symmetric = isSymetric();
+    std::vector<int> pom_path;
+    int pom_cost;
+    int pom_bound;
+
     this->findCheapest();
 
     // Initialize with the start node
     std::vector<int> initial_path = { start_node };
-    std::vector<bool> initial_visited(nodesNumber, false);
-    initial_visited[start_node] = true;
-
     int initial_bound = lowerBound(initial_path, start_node);
     q.push(Node(start_node, initial_path, 0, initial_bound, 0));
 
@@ -132,7 +139,6 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
         Node current = q.front();
         q.pop();
 
-        // Check if the current cost exceeds the minimum path cost
         if (current.cost > minPathCost) {
             continue;
         }
@@ -151,30 +157,56 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
             continue;
         }
 
+        std::vector<bool> visited(nodesNumber, false);
+        for (int node : current.path) {
+            visited[node] = true;
+        }
+
         // Explore the neighbors (next level)
         for (int next_vertex = 0; next_vertex < nodesNumber; ++next_vertex) {
+ 
+            //
 
-            if (symmetric && current.level == 1 && next_vertex > start_node) {
-                continue;
-            }
-
-            // Ignore vertices that are already in the path or have no edge
-            if (matrix[current.current_vertex][next_vertex] == -1 ||
-                std::find(current.path.begin(), current.path.end(), next_vertex) != current.path.end()) {
+            if (matrix[current.current_vertex][next_vertex] == -1 || visited[next_vertex]) {
                 continue;
             }
 
             // Calculate new cost and lower bound
-            int pom_cost = current.cost + matrix[current.current_vertex][next_vertex];
-            std::vector<int> pom_path = current.path;
+            pom_cost = current.cost + matrix[current.current_vertex][next_vertex];
+
+            if (pom_cost > minPathCost) {
+                continue;
+            }
+
+            pom_path = current.path;
             pom_path.push_back(next_vertex);
 
-            int pom_bound = pom_cost + lowerBound(pom_path, next_vertex);
-
-            // If the lower bound is less than the current minimum path cost, add the node to the queue
+			// Calculate the lower bound
+            pom_bound = pom_cost + lowerBound(visited, next_vertex);
+			// If the lower bound is less than the current minimum path cost, add the node to the queue
             if (pom_bound < minPathCost) {
                 q.push(Node(next_vertex, pom_path, pom_cost, pom_bound, current.level + 1));
             }
+
+            //
+
+            // Ignore vertices that are already in the path or have no edge
+            //if (matrix[current.current_vertex][next_vertex] == -1 ||
+            //    std::find(current.path.begin(), current.path.end(), next_vertex) != current.path.end()) {
+            //    continue;
+            //}
+
+            //// Calculate new cost and lower bound
+            //int pom_cost = current.cost + matrix[current.current_vertex][next_vertex];
+            //std::vector<int> pom_path = current.path;
+            //pom_path.push_back(next_vertex);
+
+            //int pom_bound = pom_cost + lowerBound(pom_path, next_vertex);
+
+            //// If the lower bound is less than the current minimum path cost, add the node to the queue
+            //if (pom_bound < minPathCost) {
+            //    q.push(Node(next_vertex, pom_path, pom_cost, pom_bound, current.level + 1));
+            //}
         }
     }
 
@@ -183,70 +215,6 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
 
     return result;
 }
-//TSP_Result BB::findCheapestHamiltonianCircle_FILO(int start_node) {
-//    if (start_node > nodesNumber - 1 || start_node < 0) {
-//        throw std::invalid_argument("Invalid start node");
-//    }
-//
-//    this->minPathCost = INT_MAX;
-//    TSP_Result result;
-//    std::stack<Node> s;
-//
-//    std::vector<int> pom_path;
-//    int pom_cost;
-//    int pom_bound;
-//
-//    this->findCheapest();
-//
-//    // Initialize with the start node
-//    std::vector<int> initial_path = { start_node };
-//    int initial_bound = lowerBound(initial_path, start_node);
-//    s.push(Node(start_node, initial_path, 0, initial_bound, 0));
-//
-//    while (!s.empty()) {
-//        Node current = s.top();
-//        s.pop();
-//
-//        // Check for Hamiltonian Cycle
-//        if (current.level == nodesNumber - 1) {
-//            int return_cost = matrix[current.current_vertex][start_node];
-//            if (return_cost != -1) {
-//                int final_cost = current.cost + return_cost;
-//                if (final_cost < minPathCost) {
-//                    minPathCost = final_cost;
-//                    bestPath = current.path;
-//                    bestPath.push_back(start_node);
-//                }
-//            }
-//            continue;
-//        }
-//
-//        // Explore the neighbors (next level)
-//        for (int next_vertex = 0; next_vertex < nodesNumber; ++next_vertex) {
-//            // Ignore vertices that are already in the path or have no edge
-//            if (matrix[current.current_vertex][next_vertex] == -1 || std::find(current.path.begin(), current.path.end(), next_vertex) != current.path.end()) {
-//                continue;
-//            }
-//
-//            // Calculate new cost and lower bound
-//            pom_cost = current.cost + matrix[current.current_vertex][next_vertex];
-//            pom_path = current.path;
-//            pom_path.push_back(next_vertex);
-//
-//            // Calculate the lower bound
-//            pom_bound = pom_cost + lowerBound(pom_path, next_vertex);
-//            // If the lower bound is less than the current minimum path cost, add the node to the stack
-//            if (pom_bound < minPathCost) {
-//                s.push(Node(next_vertex, pom_path, pom_cost, pom_bound, current.level + 1));
-//            }
-//        }
-//    }
-//
-//    result.bestPath = bestPath;
-//    result.minPathCost = minPathCost;
-//
-//    return result;
-//}
 
 void BB::req_findCheapestHamiltonianCircle(std::vector<int>& path, std::vector<bool>& visited, int current, int currentCost) {
 
@@ -317,12 +285,4 @@ void BB::findCheapest() {
             }
         }
     }    
-}
-bool BB::isSymetric() {
-    for (int i = 0; i < nodesNumber; i++) {
-        for (int j = i + 1; j < nodesNumber; j++) {
-            if (matrix[i][j] != matrix[j][i]) return false;
-        }
-    }
-    return true;
 }

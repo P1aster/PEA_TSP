@@ -26,7 +26,7 @@ void processGraph(
     double totalRelativeErrorPercentage = 0;
     int repeats = config.getRepeatNumber();
 
-    TSP_Result bestResult; // Store the best result across all repeats
+    TSP_Result bestResult;
     bool firstRun = true;
 
     for (int repeat = 0; repeat < repeats; repeat++) {
@@ -34,7 +34,6 @@ void processGraph(
         TSP_Result result = algorithmFunction();
         timer.stop();
 
-        // Update best result if this is the first run or if we found a better path
         if (firstRun || result.minPathCost < bestResult.minPathCost) {
             bestResult = result;
             firstRun = false;
@@ -212,14 +211,14 @@ void processBBLC(Graph& graph, Config& config, const std::vector<int>& nodesList
         return bb.findCheapestHamiltonianCircle_LC(startNode);
         };
 
-    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_DFS");
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_LC");
 }
 
 void processBBBFS(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
     BB bb(graph);
 
     auto algorithmFunction = [&bb](int startNode) {
-        return bb.findCheapestHamiltonianCircle_LC(startNode);
+        return bb.findCheapestHamiltonianCircle_BFS(startNode);
         };
 
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_BFS");
@@ -252,7 +251,7 @@ void processBRNNBBBFS(Graph& graph, Config& config, const std::vector<int>& node
     RNN rnn(graph);
     auto algorithmFunction = [&bb, &rnn](int startNode) {
         TSP_Result result = rnn.findBestRepeatedNearestNeighbour();
-        return bb.findCheapestHamiltonianCircle_LC(startNode, result.minPathCost);
+        return bb.findCheapestHamiltonianCircle_BFS(startNode, result.minPathCost);
         };
 
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_BFS");
@@ -299,7 +298,6 @@ int main(int argslen, char* args[]) {
 		nodesList = config.getNodeList();
     }
 
-
     if (!config.openOutputFile()) {
 		std::cerr << "Failed to open output file." << std::endl;
 		return 1;
@@ -307,12 +305,11 @@ int main(int argslen, char* args[]) {
 
     config.preprocessOutputFile(knownMinPathCost, nodesNumber);
 
-
     #ifdef BUILD_BF
         processBF(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_RNN)
         processRNN(graph, config, nodesList, knownMinPathCost);
-    #elif defined(processBRNN)
+    #elif defined(BUILD_BRNN)
 	    processBRNN(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_R)
 	    processR(graph, config, nodesList, knownMinPathCost, permutations, maxDuration);
