@@ -51,6 +51,8 @@ R::R(Graph graph) {
 //    return result;
 //}
 TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, std::optional<int> knownMinPathCost, std::optional<int> maxDurationMs) {
+
+
     Time time;
     time.start();
    
@@ -58,7 +60,7 @@ TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, s
     std::mt19937 g(rd());
 
     TSP_Result result;
-    minPathCost = INT_MAX;
+    this->minPathCost = INT_MAX;
 
     std::vector<int> nodes(nodesNumber);
 
@@ -68,9 +70,8 @@ TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, s
     for (int i = 0; i < nodesNumber; ++i) {
         nodes[i] = i;
     }
-    int maxPermutations = permutations.value_or(INT_MAX);
-    int totalPermutations = std::min(maxPermutations, static_cast<int>(std::tgamma(nodesNumber + 1))); // n!
-
+    unsigned maxPermutations = permutations.value_or(INT_MAX);
+    unsigned int totalPermutations = std::min(static_cast<int>(maxPermutations), static_cast<int>(std::tgamma(nodesNumber + 1))); // n!
     for (int i = 0; i < totalPermutations; ++i) { // Try [n] random permutations
         std::shuffle(nodes.begin(), nodes.end(), g);
 
