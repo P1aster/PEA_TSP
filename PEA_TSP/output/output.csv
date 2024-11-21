@@ -2,4 +2,4 @@ Input Path,./data/data18.txt
 Nodes Number,18
 Min path cost,
 StartNode,repeat 1,repeat 2,repeat 3,repeat 4,repeat 5,repeat 6,repeat 7,repeat 8,repeat 9,repeat 10,Avg Time, Best Result, Avg Absolute Err, Avg Relative Err
-,1.461700,1.397300,1.488900,1.386800,1.493400,2.030600,2.067000,1.574300,1.580400,2.078800,1.655920,274,0.000000,0.000000%
+0,1349.354248,1271.042969,
