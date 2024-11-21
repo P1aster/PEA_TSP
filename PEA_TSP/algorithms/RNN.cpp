@@ -17,21 +17,24 @@ TSP_Result RNN::findRepeatedNearestNaighbour() {
     std::vector<int> path;
     std::vector<bool> visited;
 
-
     for (int i = 0; i < nodesNumber; i++) {
-        visited = std::vector<bool>(nodesNumber, false);
-        path.push_back(i); 
-        visited[i] = true; 
-        this -> minPathCost = INT_MAX;
-        this -> bestPath.clear();
+
+        this->minPathCost = INT_MAX;
+        this->bestPath.clear();
         path.clear();
+        path.push_back(i); 
+
+        visited = std::vector<bool>(nodesNumber, false);
+        visited[i] = true; 
+
 
         this->req_findNearestNaighbour(path, visited, i, 0);
 
         if (minPathCost < totalMinPathCost) {
             totalMinPathCost = minPathCost;
             totalBestPath = bestPath;
-        }       
+        }      
+        
     }
 
     result.bestPath = totalBestPath;
@@ -86,6 +89,7 @@ TSP_Result RNN::findBestNearestNeighbour(int start_node) {
 }
 
 TSP_Result RNN::findBestRepeatedNearestNeighbour() {
+
     TSP_Result result;
 
     std::vector<int> totalBestPath;
@@ -119,8 +123,6 @@ TSP_Result RNN::findBestRepeatedNearestNeighbour() {
 
 
 void RNN::req_findNearestNaighbour(std::vector<int> path, std::vector<bool>visited, int current, int currentCost) {
-
-    
     if (path.size() == nodesNumber) {
         if (matrix[current][path[0]] != -1) {
             int totalCost = currentCost + matrix[current][path[0]];
