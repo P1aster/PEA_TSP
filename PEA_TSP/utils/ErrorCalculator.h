@@ -5,9 +5,9 @@ class ErrorCalculator {
 public:
     ErrorCalculator(std::optional<double> trueValue = 0);
 
-    double calculateAbsoluteError(double measuredValue) const;
+    double calculateAbsoluteError(double measuredValue);
 
-    double calculateRelativeError(double measuredValue) const;
+    double calculateRelativeError(double measuredValue);
 
 	void setTrueValue(double trueValue);
 

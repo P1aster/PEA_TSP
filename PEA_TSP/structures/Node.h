@@ -11,7 +11,7 @@ struct Node {
     Node(int vertex, std::vector<int> path, int cost, int lower_bound, int level) :
         current_vertex(vertex), path(path), cost(cost), lower_bound(lower_bound), level(level) {}
 
-    // Comparator for priority queue to make min-heap based on lower bound (Best-First Search)
+    // Comparator for priority queue
     bool operator>(const Node& other) const {
         return lower_bound > other.lower_bound;
     }

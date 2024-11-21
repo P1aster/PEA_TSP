@@ -146,6 +146,9 @@ void Config::writeToOutputFile(const std::string& content) {
 void Config::closeOutputFile() {
     if (outputFile.is_open()) {
         outputFile.close();
+	}
+    else {
+        std::cerr << "Output file is not open." << std::endl;
     }
 }
 void Config::cout(std::string str) {

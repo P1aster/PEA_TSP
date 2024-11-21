@@ -71,7 +71,7 @@
     <ClInclude Include="structures\Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ErrorCalculator.h">
+    <ClInclude Include="utils\ErrorCalculator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

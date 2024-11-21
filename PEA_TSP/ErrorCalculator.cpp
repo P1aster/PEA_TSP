@@ -5,11 +5,11 @@ ErrorCalculator::ErrorCalculator(std::optional<double> trueValue) {
 	this->trueValue = trueValue.value_or(0.0);
 }
 
-double ErrorCalculator::calculateAbsoluteError(double measuredValue) const {
+double ErrorCalculator::calculateAbsoluteError(double measuredValue) {
     return std::abs(measuredValue - trueValue);
 }
 
-double ErrorCalculator::calculateRelativeError(double measuredValue) const {
+double ErrorCalculator::calculateRelativeError(double measuredValue) {
     return (calculateAbsoluteError(measuredValue) / trueValue) * 100.0;
 }
 

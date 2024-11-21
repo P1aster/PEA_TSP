@@ -28,7 +28,7 @@ public:
     TSP_Result findCheapestHamiltonianCircle_DFS(int start_node, std::optional<int> upper_limit = std::nullopt);
     TSP_Result findCheapestHamiltonianCircle_LC(int start_node, std::optional<int>upper_limit = std::nullopt);
     TSP_Result findCheapestHamiltonianCircle_BFS(int start_node, std::optional<int> upper_limit = std::nullopt);
-    TSP_Result findCheapestHamiltonianCircle_FILO(int start_node, std::optional<int> upper_limit = std::nullopt);
+    TSP_Result findCheapestHamiltonianCircle_LIFO(int start_node, std::optional<int> upper_limit = std::nullopt);
 
 
 };

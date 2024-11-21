@@ -12,10 +12,12 @@ TSP_Result BF::findCheapestHamiltonianCircle(int start_node) {
 		throw std::invalid_argument("Invalid start node");
     }
 
-    minPathCost = INT_MAX;
+    this->minPathCost = INT_MAX;
     TSP_Result result;
+
     std::vector<int> path;
     path.push_back(start_node);
+    
     std::vector<bool> visited(nodesNumber, false);
     visited[start_node] = true;
 
@@ -28,7 +30,6 @@ TSP_Result BF::findCheapestHamiltonianCircle(int start_node) {
 }
 
 void BF::req_findCheapestHamiltonianCircle(std::vector<int>path, std::vector<bool>visited, int current, int currentCost) {
-    int newCost = 0;
 
     if (path.size() == nodesNumber) {
         if (matrix[path.back()][path[0]] != -1) {
@@ -41,16 +42,12 @@ void BF::req_findCheapestHamiltonianCircle(std::vector<int>path, std::vector<boo
         }
         return;
     }
-
-
-
     for (int next = 0; next < nodesNumber; ++next) {
-        if (!visited[next] && matrix[current][next] > 0) {
-            newCost = currentCost + matrix[current][next];
+        if (!visited[next] && matrix[current][next] != 1) {
+            int newCost = currentCost + matrix[current][next];
             if (newCost >= minPathCost) {
                 continue; 
             }
-
             visited[next] = true;
             path.push_back(next);
             req_findCheapestHamiltonianCircle(path, visited, next, newCost);

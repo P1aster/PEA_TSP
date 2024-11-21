@@ -87,7 +87,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BUILD_R</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILD_RNN</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>
@@ -112,7 +112,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BUILD_R</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILD_RNN</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>
@@ -141,11 +141,11 @@
     <ClInclude Include="algorithms\BF.h" />
     <ClInclude Include="algorithms\R.h" />
     <ClInclude Include="algorithms\RNN.h" />
-    <ClInclude Include="ErrorCalculator.h" />
     <ClInclude Include="structures\Graph.h" />
     <ClInclude Include="structures\Node.h" />
     <ClInclude Include="structures\TSP_Result.h" />
     <ClInclude Include="utils\Config.h" />
+    <ClInclude Include="utils\ErrorCalculator.h" />
     <ClInclude Include="utils\Time.h" />
   </ItemGroup>
   <ItemGroup>

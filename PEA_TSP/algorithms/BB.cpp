@@ -20,13 +20,13 @@ TSP_Result BB::findCheapestHamiltonianCircle_DFS(int start_node, std::optional<i
 
     TSP_Result result;
 
-
     this->minPathCost = upper_limit.value_or(INT_MAX);
+
     std::vector<int> path;
     path.push_back(start_node);
+    
     std::vector<bool> visited(nodesNumber, false);
     visited[start_node] = true;
-
 
     this->findCheapest();
     this->req_findCheapestHamiltonianCircle(path, visited, start_node, 0);
@@ -39,9 +39,9 @@ TSP_Result BB::findCheapestHamiltonianCircle_LC(int start_node, std::optional<in
     if (start_node > nodesNumber - 1 || start_node < 0) {
         throw std::invalid_argument("Invalid start node");
     }
+    TSP_Result result;
 
     this->minPathCost = upper_limit.value_or(INT_MAX);
-    TSP_Result result;
     std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq; //smallest elements will apear on front 
 
     std::vector<int> pom_path;
@@ -89,7 +89,7 @@ TSP_Result BB::findCheapestHamiltonianCircle_LC(int start_node, std::optional<in
                 continue;
             }
 
-            // Calculate new cost and lower bound
+            // Calculate new cost
             pom_cost = current.cost + matrix[current.current_vertex][next_vertex];
 
             if (pom_cost > minPathCost) {
@@ -101,13 +101,13 @@ TSP_Result BB::findCheapestHamiltonianCircle_LC(int start_node, std::optional<in
 
 			// Calculate the lower bound
             pom_bound = pom_cost + lowerBound(visited, next_vertex);
-			// If the lower bound is less than the current minimum path cost, add the node to the queue
+			
+            // If the lower bound is less than the current minimum path cost, add the node to the queue
             if (pom_bound < minPathCost) {
                 pq.push(Node(next_vertex, pom_path, pom_cost, pom_bound, current.level + 1));
             }
         }
     }
-
 
 	result.bestPath = bestPath;
 	result.minPathCost = minPathCost;
@@ -192,7 +192,7 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
 
     return result;
 }
-TSP_Result BB::findCheapestHamiltonianCircle_FILO(int start_node, std::optional<int> upper_limit) {
+TSP_Result BB::findCheapestHamiltonianCircle_LIFO(int start_node, std::optional<int> upper_limit) {
     if (start_node > nodesNumber - 1 || start_node < 0) {
         throw std::invalid_argument("Invalid start node");
     }

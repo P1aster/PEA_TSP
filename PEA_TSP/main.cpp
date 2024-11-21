@@ -214,11 +214,11 @@ void processBBLC(Graph& graph, Config& config, const std::vector<int>& nodesList
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_LC");
 }
 
-void processBBFILO(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+void processBBLIFO(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
     BB bb(graph);
 
     auto algorithmFunction = [&bb](int startNode) {
-        return bb.findCheapestHamiltonianCircle_FILO(startNode);
+        return bb.findCheapestHamiltonianCircle_LIFO(startNode);
         };
 
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_FILO");
@@ -247,12 +247,12 @@ void processBRNNBBLC(Graph& graph, Config& config, const std::vector<int>& nodes
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_DFS");
 }
 
-void processBRNNBBFILO(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+void processBRNNBBLIFO(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
     BB bb(graph);
     RNN rnn(graph);
     auto algorithmFunction = [&bb, &rnn](int startNode) {
         TSP_Result result = rnn.findBestRepeatedNearestNeighbour();
-        return bb.findCheapestHamiltonianCircle_FILO(startNode, result.minPathCost);
+        return bb.findCheapestHamiltonianCircle_LIFO(startNode, result.minPathCost);
         };
 
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_FILO");
@@ -318,15 +318,14 @@ int main(int argslen, char* args[]) {
 	    processBBDFS(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BB_LC)
 	    processBBLC(graph, config, nodesList, knownMinPathCost);
-    #elif defined(BUILD_BB_FILO)
-        processBBFILO(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_BB_LIFO)
+        processBBLIFO(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BRNN_BB_DFS)
         processBRNNBBDFS(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BRNN_BB_LC)
         processBRNNBBLC(graph, config, nodesList, knownMinPathCost);
-    
-    #elif defined(BUILD_BRNN_BB_FILO)
-        processBRNNBBFILO(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_BRNN_BB_LIFO)
+        processBRNNBBLIFO(graph, config, nodesList, knownMinPathCost);
     #else
         std::cout << "No function is defined to call!" << std::endl;
         return 1;

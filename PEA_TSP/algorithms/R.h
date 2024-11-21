@@ -14,7 +14,6 @@ private:
 
 public:
 	R(Graph graph);
-    //TSP_Result findBestRandomHamiltonianCircle(int permutations);
     TSP_Result findBestRandomHamiltonianCircle(std::optional<int> permutations = std::nullopt, std::optional<int> knownMinPathCost = std::nullopt, std::optional<int> maxDurationMs = std::nullopt);
 };
 

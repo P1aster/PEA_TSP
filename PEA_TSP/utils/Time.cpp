@@ -1,17 +1,17 @@
 #include "Time.h"
 
-void Time::start() {
+
+void Time::start(void) {
     startTime = std::chrono::high_resolution_clock::now();
 }
 
-void Time::stop() {
+void Time::stop(void) {
     stopTime = std::chrono::high_resolution_clock::now();
 }
 
-float Time::getElapsedTime() {
+float Time::getElapsedTime(void) {
     // A floating point milliseconds definition type
-    using FP_time =
-        std::chrono::duration<float, std::chrono::milliseconds::period>;
+    using FP_time = std::chrono::duration<float, std::chrono::milliseconds::period>;
 
     // Check if the rep is a floating point
     static_assert(std::chrono::treat_as_floating_point<FP_time::rep>::value, "Rep required to be floating point");
@@ -20,7 +20,7 @@ float Time::getElapsedTime() {
     return FP_time(stopTime - startTime).count();
 }
 
-float Time::getElapsedTimeNow() {
+float Time::getElapsedTimeNow(void) {
     // A floating point milliseconds definition type
     using FP_time = std::chrono::duration<float, std::chrono::milliseconds::period>;
 
