@@ -41,7 +41,7 @@ TSP_Result BB::findCheapestHamiltonianCircle_LC(int start_node, std::optional<in
     }
     TSP_Result result;
 
-    this->minPathCost = upper_limit.value_or(INT_MAX);
+    minPathCost = upper_limit.value_or(INT_MAX);
     std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq; //smallest elements will apear on front 
 
     std::vector<int> pom_path;
@@ -119,7 +119,23 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
         throw std::invalid_argument("Invalid start node");
     }
 
+    struct State {
+        int current_vertex;                 // Obecne miasto
+        int cost;                 // Dotychczasowy koszt
+        std::vector<int> path;    // Bie??ca ?cie?ka
+        std::vector<bool> visited; // Informacja o odwiedzonych miastach
+
+        State(int current_vertex, int cost, const std::vector<int>& path, const std::vector<bool>& visited)
+            : current_vertex(current_vertex), cost(cost), path(path), visited(visited) {
+        }
+    };
+
+    std::queue<State> q;
+
+
+
     this->minPathCost = upper_limit.value_or(INT_MAX);
+
     TSP_Result result;
     std::queue<Node> q;
 
@@ -129,18 +145,17 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
 
     this->findCheapest();
 
-    // Initialize with the start node
+    this -> visited = std::vector<bool>(nodesNumber, false);
+    visited[start_node] = true;
+    
     std::vector<int> initial_path = { start_node };
-    int initial_bound = lowerBound(initial_path, start_node);
+    int initial_bound = lowerBound(visited, start_node);
     q.push(Node(start_node, initial_path, 0, initial_bound, 0));
 
     while (!q.empty()) {
+
         Node current = q.front();
         q.pop();
-
-        if (current.lower_bound > minPathCost) {
-            continue;
-        }
 
         //Check for Hamiltonian Cyrcle
         if (current.level == nodesNumber - 1) {
@@ -148,42 +163,41 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
             if (return_cost != -1) {
                 int final_cost = current.cost + return_cost;
                 if (final_cost <= minPathCost) {
-                    minPathCost = final_cost;
-                    bestPath = current.path;
-                    bestPath.push_back(start_node);
+                    this->minPathCost = final_cost;
+                    this->bestPath = current.path;
+                    this->bestPath.push_back(start_node);
                 }
             }
             continue;
         }
 
-        std::vector<bool> visited(nodesNumber, false);
+        this -> visited = std::vector<bool>(nodesNumber, false);
         for (int node : current.path) {
-            visited[node] = true;
+            this->visited[node] = true;
         }
 
-        // Explore the neighbors (next level)
-        for (int next_vertex = 0; next_vertex < nodesNumber; ++next_vertex) {
-
-            if (matrix[current.current_vertex][next_vertex] == -1 || visited[next_vertex]) {
+        for (int next = 0; next < nodesNumber; next++) {
+            int nextEdgeCost = matrix[current.current_vertex][next];
+            
+            if (nextEdgeCost == -1 || visited[next]) {
                 continue;
             }
-
-            // Calculate new cost and lower bound
-            pom_cost = current.cost + matrix[current.current_vertex][next_vertex];
-
-            if (pom_cost > minPathCost) {
+            
+            // Compute new bound
+            int newCost = current.cost + nextEdgeCost;
+            visited[next] = true;
+            int newBound = newCost + lowerBound(visited, next);
+            visited[next] = false;
+            
+            // Pruning condition
+            if (newBound >= minPathCost) {
                 continue;
             }
-
-            pom_path = current.path;
-            pom_path.push_back(next_vertex);
-
-            // Calculate the lower bound
-            pom_bound = pom_cost + lowerBound(visited, next_vertex);
-            // If the lower bound is less than the current minimum path cost, add the node to the queue
-            if (pom_bound < minPathCost) {
-                q.push(Node(next_vertex, pom_path, pom_cost, pom_bound, current.level + 1));
-            }
+            
+            std::vector<int> newPath = current.path;
+            newPath.push_back(next);
+            
+            q.push(Node(next, newPath, newCost, newBound, current.level + 1));
         }
     }
 

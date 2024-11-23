@@ -1,3 +1,3 @@
-./data/data18.txt
+./data/data15.txt
 ./output/output.csv
-{"checkAllNodes": false, "nodeList": [0], "maxDuration": 10000, "repeatNumber": 10, "print": true}
+{"checkAllNodes": true, "nodeList": [0], "maxDuration": 10000, "repeatNumber": 5, "print": true}

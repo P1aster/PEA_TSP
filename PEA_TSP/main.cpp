@@ -166,21 +166,22 @@ void processBF(Graph& graph, Config& config, const std::vector<int>& nodesList, 
 void processRNN(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
     RNN rnn(graph);
 
-	config.writeToOutputFile(",");
-    auto algorithmFunction = [&rnn]() {
-        return rnn.findRepeatedNearestNaighbour();
+    auto algorithmFunction = [&rnn](int startNode) {
+        return rnn.findNearestNaighbour(startNode);
         };
 
-    processGraph(graph, config, nodesList, knownMinPathCost, algorithmFunction, "RNN");
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "RNN");
 }
 
 void processBRNN(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
 	RNN rnn(graph);
-	config.writeToOutputFile(",");
-	auto algorithmFunction = [&rnn]() {
-		return rnn.findBestRepeatedNearestNeighbour();
-	};
-	processGraph(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BRNN");
+    
+    auto algorithmFunction = [&rnn](int startNode) {
+        return rnn.findBestNearestNeighbour(startNode);
+    };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BRNN");
+
 }
 
 void processR(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<unsigned int> knownMinPathCost, std::optional<unsigned int> permutations, std::optional<unsigned int> maxDuration) {
@@ -214,6 +215,16 @@ void processBBLC(Graph& graph, Config& config, const std::vector<int>& nodesList
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_LC");
 }
 
+void processBFS(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    BB bb(graph);
+
+    auto algorithmFunction = [&bb](int startNode) {
+        return bb.findCheapestHamiltonianCircle_BFS(startNode);
+        };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_BFS");
+}
+
 void processBBLIFO(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
     BB bb(graph);
 
@@ -223,7 +234,6 @@ void processBBLIFO(Graph& graph, Config& config, const std::vector<int>& nodesLi
 
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_FILO");
 }
-
 
 void processBRNNBBDFS(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
     BB bb(graph);
@@ -245,6 +255,17 @@ void processBRNNBBLC(Graph& graph, Config& config, const std::vector<int>& nodes
         };
 
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_DFS");
+}
+
+void processBRNNBFS(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
+    BB bb(graph);
+    RNN rnn(graph);
+    auto algorithmFunction = [&bb, &rnn](int startNode) {
+        TSP_Result result = rnn.findBestRepeatedNearestNeighbour();
+        return bb.findCheapestHamiltonianCircle_BFS(startNode, result.minPathCost);
+    };
+
+    processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_BRNN_BFS");
 }
 
 void processBRNNBBLIFO(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
@@ -318,12 +339,16 @@ int main(int argslen, char* args[]) {
 	    processBBDFS(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BB_LC)
 	    processBBLC(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_BB_BFS)
+        processBFS(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BB_LIFO)
         processBBLIFO(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BRNN_BB_DFS)
         processBRNNBBDFS(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BRNN_BB_LC)
         processBRNNBBLC(graph, config, nodesList, knownMinPathCost);
+    #elif defined(BUILD_BRNN_BB_BFS)
+        processBRNNBFS(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BRNN_BB_LIFO)
         processBRNNBBLIFO(graph, config, nodesList, knownMinPathCost);
     #else

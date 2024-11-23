@@ -129,7 +129,10 @@
     <ClCompile Include="algorithms\BB.cpp" />
     <ClCompile Include="algorithms\BF.cpp" />
     <ClCompile Include="algorithms\R.cpp" />
-    <ClCompile Include="algorithms\RNN.cpp" />
+    <ClCompile Include="algorithms\RNN.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BUILD_RNN</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">BUILD_RNN</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="ErrorCalculator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="structures\Graph.cpp" />

@@ -42,8 +42,8 @@ void BF::req_findCheapestHamiltonianCircle(std::vector<int>path, std::vector<boo
         }
         return;
     }
-    for (int next = 0; next < nodesNumber; ++next) {
-        if (!visited[next] && matrix[current][next] != 1) {
+    for (int next = 0; next < nodesNumber; next++) {
+        if (!visited[next] && matrix[current][next] != -1) {
             int newCost = currentCost + matrix[current][next];
             if (newCost >= minPathCost) {
                 continue; 
