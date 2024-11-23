@@ -18,7 +18,7 @@ TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, s
     std::mt19937 g(rd());
 
     TSP_Result result;
-    this->minPathCost = INT_MAX;
+    minPathCost = INT_MAX;
 
     std::vector<int> nodes(nodesNumber);
 

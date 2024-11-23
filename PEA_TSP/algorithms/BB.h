@@ -20,7 +20,6 @@ private:
     int minPathCost = INT_MAX;
 
     void findCheapest();
-    int lowerBound(std::vector<int>& path, int current_node);
     int lowerBound(std::vector<bool>& visited, int current_node);
     void req_findCheapestHamiltonianCircle(std::vector<int>& currentPath, std::vector<bool>& visited, int current, int currentCost);
 public:
@@ -28,7 +27,6 @@ public:
     TSP_Result findCheapestHamiltonianCircle_DFS(int start_node, std::optional<int> upper_limit = std::nullopt);
     TSP_Result findCheapestHamiltonianCircle_LC(int start_node, std::optional<int>upper_limit = std::nullopt);
     TSP_Result findCheapestHamiltonianCircle_BFS(int start_node, std::optional<int> upper_limit = std::nullopt);
-    TSP_Result findCheapestHamiltonianCircle_LIFO(int start_node, std::optional<int> upper_limit = std::nullopt);
 
 
 };
