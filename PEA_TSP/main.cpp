@@ -28,11 +28,11 @@ void processGraph(
     TSP_Result bestResult;
     bool firstRun = true;
 
+    config.writeToOutputFile(",");
     for (int repeat = 0; repeat < repeats; repeat++) {
         timer.start();
         TSP_Result result = algorithmFunction();
         timer.stop();
-
         if (firstRun || result.minPathCost < bestResult.minPathCost) {
             bestResult = result;
             firstRun = false;
@@ -70,9 +70,11 @@ void processGraph(
     double averageAbsoluteError = totalAbsoluteError / repeats;
     double averageRelativeErrorPercentage = totalRelativeErrorPercentage / repeats;
 
+    int bestMinPathCost = bestResult.minPathCost;
+
     // Write the final results including the best path cost found
     config.writeToOutputFile(std::to_string(averageElapsedTime) + ",");
-    config.writeToOutputFile(std::to_string(bestResult.minPathCost) + ",");
+    config.writeToOutputFile(std::to_string(bestMinPathCost) + ",");
     config.writeToOutputFile(std::to_string(averageAbsoluteError) + ",");
     config.writeToOutputFile(std::to_string(averageRelativeErrorPercentage) + "%\n");
 }
@@ -250,7 +252,6 @@ void processBRNNBBBFS(Graph& graph, Config& config, const std::vector<int>& node
     RNN rnn(graph);
     auto algorithmFunction = [&bb, &rnn](int startNode) {
         TSP_Result result = rnn.findBestRepeatedNearestNeighbour();
-		std::cout << "Result min path cost: " << result.minPathCost << std::endl;
         return bb.findCheapestHamiltonianCircle_BFS(startNode, result.minPathCost);
     };
 

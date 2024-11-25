@@ -152,27 +152,15 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
 
     std::vector<bool> visited_start_node(nodesNumber, false);
     visited_start_node[start_node] = true;
-    q.emplace(start_node, 0, std::vector<int>{start_node}, visited_start_node);
+    q.emplace(QueueNodeState(start_node, 0, std::vector<int>{start_node}, visited_start_node));
 
     minPathCost = upper_limit.value_or(INT_MAX);
-
-    std::vector<std::vector<int>> minCost(nodesNumber, std::vector<int>(1 << nodesNumber, INT_MAX));
-
-    minCost[0][1] = 0;
 
     while (!q.empty()) {
         QueueNodeState current = q.front();
         q.pop();
 
-        bool allVisited = true;
-        for (bool visited : current.visited) {
-            if (!visited) {
-                allVisited = false;
-                break;
-            }
-        }
-
-        if (allVisited) {
+        if (current.path.size() == nodesNumber) {
             int return_cost = matrix[current.node][start_node];
             if (return_cost != -1) {
                 int final_cost = current.cost + return_cost;
@@ -199,13 +187,11 @@ TSP_Result BB::findCheapestHamiltonianCircle_BFS(int start_node, std::optional<i
                 if (next_appriximation <= minPathCost) {
                     std::vector<int> next_path = current.path;
                     next_path.push_back(next);
-                    q.emplace(next, nextCost, next_path, next_visited);
+                    q.emplace(QueueNodeState(next, nextCost, next_path, next_visited));
                 }
             }
         }
     }
-
-
 
 	result.bestPath = bestPath;
 	result.minPathCost = minPathCost;
