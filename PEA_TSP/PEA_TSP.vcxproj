@@ -87,7 +87,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BUILD_BRNN_BB_BFS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILD_SA</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>
@@ -112,7 +112,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BUILD_BRNN_BB_BFS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILD_SA</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>
@@ -135,6 +135,7 @@
     </ClCompile>
     <ClCompile Include="ErrorCalculator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SA.cpp" />
     <ClCompile Include="structures\Graph.cpp" />
     <ClCompile Include="utils\Config.cpp" />
     <ClCompile Include="utils\Time.cpp" />
@@ -144,6 +145,8 @@
     <ClInclude Include="algorithms\BF.h" />
     <ClInclude Include="algorithms\R.h" />
     <ClInclude Include="algorithms\RNN.h" />
+    <ClInclude Include="CoolingSchema.h" />
+    <ClInclude Include="SA.h" />
     <ClInclude Include="structures\Graph.h" />
     <ClInclude Include="structures\Node.h" />
     <ClInclude Include="structures\TSP_Result.h" />

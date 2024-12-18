@@ -18,9 +18,16 @@ private:
     int repeatNumber = 0;
     bool coutFlag = false;
 
+	double initialTemperature = 0;
+	double finalTemperature = 0;
+	double coolingRate = 0;
+
     std::optional<int> permutations = std::nullopt;
     std::optional<int> knownMinPathCost = std::nullopt;
     std::optional<int> maxDuration = std::nullopt;
+
+
+
 
 
 
@@ -42,6 +49,10 @@ public:
     std::optional<int> getMaxDuration();
     bool getCheckAllNodes();
     std::vector<int> getNodeList();
+
+	double getInitialTemperature();
+	double getFinalTemperature();
+	double getCoolingRate();
 
     void cout(std::string str);
 

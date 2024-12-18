@@ -9,6 +9,9 @@
 #include "structures/Graph.h"
 #include <queue>
 #include <functional>
+#include "SA.h"
+#include "CoolingSchema.h"
+
 
 
 void processGraph(
@@ -258,6 +261,19 @@ void processBRNNBBBFS(Graph& graph, Config& config, const std::vector<int>& node
     processGraphWithStartNodes(graph, config, nodesList, knownMinPathCost, algorithmFunction, "BB_BRNN_BFS");
 }
 
+void processSA(Graph& graph, Config& config, std::optional<int> knownMinPathCost) {
+	SA sa(graph, CoolingSchema::Exponential);
+
+    double initTemp = config.getInitialTemperature();
+    double finalTemp = config.getFinalTemperature();
+    double coolingR = config.getCoolingRate();
+
+	auto algorithmFunction = [&sa, initTemp, finalTemp, coolingR]() {
+		return sa.run(initTemp, finalTemp, coolingR);
+		};
+	processGraph(graph, config, knownMinPathCost, algorithmFunction, "SA");
+}
+
 int main(int argslen, char* args[]) {
     Graph graph;
 
@@ -325,7 +341,8 @@ int main(int argslen, char* args[]) {
         processBRNNBBLC(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BRNN_BB_BFS)
         processBRNNBBBFS(graph, config, nodesList, knownMinPathCost);
-
+    #elif defined(BUILD_SA)
+        processSA(graph, config, knownMinPathCost);
     #else
         std::cout << "No function is defined to call!" << std::endl;
         return 1;

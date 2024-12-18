@@ -96,6 +96,16 @@ bool Config::readConfig() {
 					if (jsonObject.contains("print")) {
 						coutFlag = jsonObject["print"].get<bool>();
 					}
+                    if (jsonObject.contains("initialTemperature")) {
+                        initialTemperature = jsonObject["initialTemperature"].get<double>();
+                    }
+                    if (jsonObject.contains("finalTemperature")) {
+                        finalTemperature = jsonObject["finalTemperature"].get<double>();
+                    }
+                    if (jsonObject.contains("coolingRate")) {
+                        coolingRate = jsonObject["coolingRate"].get<double>();
+
+                    }
                 }
                 else {
                     std::cerr << "Line is not in JSON format: " << line << std::endl;
@@ -124,6 +134,9 @@ bool Config::getCoutFlag() { return coutFlag; };
 std::optional<int> Config::getKnownMinPathCost() { return knownMinPathCost; };
 std::optional<int> Config::getPermutations() { return permutations; };
 std::optional<int> Config::getMaxDuration() { return maxDuration; };
+double Config::getInitialTemperature() { return initialTemperature; };
+double Config::getFinalTemperature() { return finalTemperature; };
+double Config::getCoolingRate() { return coolingRate; };
 bool Config::getCheckAllNodes() { return checkAllNodes; };
 std::vector<int> Config::getNodeList() { return nodeList; }
 
