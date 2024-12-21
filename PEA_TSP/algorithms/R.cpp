@@ -74,3 +74,66 @@ TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, s
 
     return result;
 }
+
+TSP_Result R::findFirstRandomHamiltonianCircle(std::optional<int> knownMinPathCost, std::optional<int> maxDurationMs) {
+    Time time;
+    std::random_device rd;
+    std::mt19937 g(rd());
+    TSP_Result result;
+
+    std::vector<int> nodes(nodesNumber);
+    for (int i = 0; i < nodesNumber; ++i) {
+        nodes[i] = i;
+    }
+
+    time.start();
+    while (true) {
+        std::shuffle(nodes.begin(), nodes.end(), g); // Random permutation
+
+        int currentCost = 0;
+        bool validCycle = true;
+
+        for (int j = 0; j < nodesNumber - 1; ++j) {
+            int from = nodes[j];
+            int to = nodes[j + 1];
+            if (matrix[from][to] == -1) {
+                validCycle = false;
+                break;
+            }
+            currentCost += matrix[from][to];
+        }
+
+        // Add the cost from the last node back to the first to complete the cycle
+        if (validCycle && matrix[nodes[nodesNumber - 1]][nodes[0]] != -1) {
+            currentCost += matrix[nodes[nodesNumber - 1]][nodes[0]];
+        }
+        else {
+            validCycle = false;
+        }
+
+        if (validCycle) {
+            result.bestPath = nodes;
+            result.bestPath.push_back(nodes[0]); // Complete the cycle
+            result.minPathCost = currentCost;
+            return result;
+        }
+
+        // Check if known minimum path cost is reached
+        if (knownMinPathCost.has_value() && currentCost <= knownMinPathCost.value()) {
+            break;
+        }
+
+        // Check if maximum duration has been exceeded
+        if (maxDurationMs.has_value()) {
+            float elapsedTime = time.getElapsedTimeNow();
+            if (elapsedTime >= maxDurationMs.value()) {
+                break;
+            }
+        }
+    }
+
+    // No valid cycle found within constraints
+    result.minPathCost = INT_MAX;
+    result.bestPath.clear();
+    return result;
+}

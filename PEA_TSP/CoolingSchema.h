@@ -1,6 +1,6 @@
 #pragma once
 enum class CoolingSchema {
-	Linear,
-	Exponential,
-	Logarithmic
+	Linear = 1,
+	Exponential = 2,
+	Logarithmic = 3
 };

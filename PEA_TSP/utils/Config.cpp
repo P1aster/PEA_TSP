@@ -104,8 +104,19 @@ bool Config::readConfig() {
                     }
                     if (jsonObject.contains("coolingRate")) {
                         coolingRate = jsonObject["coolingRate"].get<double>();
-
                     }
+
+                    if (jsonObject.contains("initialPathMethod")) {
+                        initialPathMethod = jsonObject["initialPathMethod"].get<std::string>();
+                    }
+					if (jsonObject.contains("patience")) {
+						patience = jsonObject["patience"].get<int>();
+					}
+
+                    if (jsonObject.contains("coolingSchema")) {
+                        coolingSchema = jsonObject["coolingSchema"].get<CoolingSchema>();
+                    }
+
                 }
                 else {
                     std::cerr << "Line is not in JSON format: " << line << std::endl;
@@ -134,9 +145,12 @@ bool Config::getCoutFlag() { return coutFlag; };
 std::optional<int> Config::getKnownMinPathCost() { return knownMinPathCost; };
 std::optional<int> Config::getPermutations() { return permutations; };
 std::optional<int> Config::getMaxDuration() { return maxDuration; };
+std::string Config::getInitialPathMethod() { return initialPathMethod; };
+int Config::getPatience() { return patience; };
 double Config::getInitialTemperature() { return initialTemperature; };
 double Config::getFinalTemperature() { return finalTemperature; };
 double Config::getCoolingRate() { return coolingRate; };
+CoolingSchema Config::getCoolingSchema() { return coolingSchema; };
 bool Config::getCheckAllNodes() { return checkAllNodes; };
 std::vector<int> Config::getNodeList() { return nodeList; }
 

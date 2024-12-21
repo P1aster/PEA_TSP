@@ -262,14 +262,19 @@ void processBRNNBBBFS(Graph& graph, Config& config, const std::vector<int>& node
 }
 
 void processSA(Graph& graph, Config& config, std::optional<int> knownMinPathCost) {
-	SA sa(graph, CoolingSchema::Exponential);
+	SA sa(graph);
 
     double initTemp = config.getInitialTemperature();
     double finalTemp = config.getFinalTemperature();
     double coolingR = config.getCoolingRate();
+    int patience = config.getPatience();
+    std::string initialPathMethod = config.getInitialPathMethod();
+    std::optional<int> maxDuration = config.getMaxDuration();
+	CoolingSchema coolingSchema = config.getCoolingSchema();
 
-	auto algorithmFunction = [&sa, initTemp, finalTemp, coolingR]() {
-		return sa.run(initTemp, finalTemp, coolingR);
+
+	auto algorithmFunction = [&sa, initTemp, finalTemp, coolingR, coolingSchema, patience, initialPathMethod, maxDuration, knownMinPathCost]() {
+		return sa.run(initTemp, finalTemp, coolingR, coolingSchema, patience, initialPathMethod, maxDuration, knownMinPathCost);
 		};
 	processGraph(graph, config, knownMinPathCost, algorithmFunction, "SA");
 }

@@ -5,6 +5,8 @@
 #include <fstream>
 #include <optional>
 #include "../structures/Graph.h"
+#include "../CoolingSchema.h"
+
 
 class Config {
 private:
@@ -22,14 +24,13 @@ private:
 	double finalTemperature = 0;
 	double coolingRate = 0;
 
+	CoolingSchema coolingSchema = CoolingSchema::Exponential;
+	std::string initialPathMethod = "RNN";
+
+	int patience = 1000;
     std::optional<int> permutations = std::nullopt;
     std::optional<int> knownMinPathCost = std::nullopt;
     std::optional<int> maxDuration = std::nullopt;
-
-
-
-
-
 
     std::ofstream outputFile;
 
@@ -53,6 +54,9 @@ public:
 	double getInitialTemperature();
 	double getFinalTemperature();
 	double getCoolingRate();
+	CoolingSchema getCoolingSchema();
+	std::string getInitialPathMethod();
+    int getPatience();
 
     void cout(std::string str);
 
