@@ -29,7 +29,6 @@ private:
 
 	bool accept(int currCost, int newCost, double temperature);
 	std::vector<int> determinNewSolution(const std::vector<int>& current_solution);
-	double updateTemperature(double currentTemperature);
 
 public:
 	SA(Graph graph);

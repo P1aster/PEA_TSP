@@ -19,7 +19,7 @@ SA::SA(Graph graph) {
     this->coolingSchema = CoolingSchema::Exponential;
 	this->nodesNumber = graph.getNodesNumber();
 	this->matrix = graph.getMatrix();
-
+	std::mt19937 gen(rd());
 }
 
 TSP_Result SA::run(double initialTemperature, double finalTemperature, double coolingRate, std::optional<CoolingSchema> coolingSchema, std::optional<int> patience, std::optional<std::string> initialPathMethod, std::optional<int> maxDurationMs, std::optional<int> knownMinPathCost) {

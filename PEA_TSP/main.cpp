@@ -11,6 +11,7 @@
 #include <functional>
 #include "SA.h"
 #include "CoolingSchema.h"
+#include "Genetic.h"
 
 
 
@@ -187,9 +188,9 @@ void processBRNN(Graph& graph, Config& config, std::optional<int> knownMinPathCo
 
 }
 
-void processR(Graph& graph, Config& config, std::optional<unsigned int> knownMinPathCost, std::optional<unsigned int> permutations, std::optional<unsigned int> maxDuration) {
+void processR(Graph& graph, Config& config, std::optional<unsigned int> knownMinPathCost, std::optional<unsigned int> permutations) {
     R r(graph);
-
+    std::optional<int> maxDuration = config.getMaxDuration();
     config.writeToOutputFile(",");
     auto algorithmFunction = [&r, permutations, knownMinPathCost, maxDuration]() {
         return r.findBestRandomHamiltonianCircle(permutations, knownMinPathCost, maxDuration);
@@ -279,6 +280,23 @@ void processSA(Graph& graph, Config& config, std::optional<int> knownMinPathCost
 	processGraph(graph, config, knownMinPathCost, algorithmFunction, "SA");
 }
 
+void processGenetic(Graph& graph, Config& config, std::optional<int> knownMinPathCost) {
+    Genetic genetic(graph);
+
+	double mutationRate = config.getMutationRate();
+	int mu = config.getMu();
+	int lambda = config.getLambda();
+    std::optional<int> maxDuration = config.getMaxDuration();
+
+
+	auto algorithmFunction = [&genetic, mutationRate, mu, lambda, knownMinPathCost, maxDuration]() {
+		return genetic.run(mu, lambda, -1, mutationRate, knownMinPathCost, maxDuration);
+	};
+
+    processGraph(graph, config, knownMinPathCost, algorithmFunction, "GENETIC");
+
+}
+
 int main(int argslen, char* args[]) {
     Graph graph;
 
@@ -306,7 +324,7 @@ int main(int argslen, char* args[]) {
     int nodesNumber = graph.getNodesNumber();
     std::optional<int> knownMinPathCost = config.getKnownMinPathCost();
 	std::optional<int> permutations = config.getPermutations();
-	std::optional<int> maxDuration = config.getMaxDuration();
+
 
     std::vector<int> nodesList;
 
@@ -333,7 +351,7 @@ int main(int argslen, char* args[]) {
     #elif defined(BUILD_BRNN)
 	    processBRNN(graph, config, knownMinPathCost);
     #elif defined(BUILD_R)
-	    processR(graph, config, knownMinPathCost, permutations, maxDuration);
+	    processR(graph, config, knownMinPathCost, permutations);
     #elif defined(BUILD_BB_DFS)
 	    processBBDFS(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_BB_LC)
@@ -348,6 +366,8 @@ int main(int argslen, char* args[]) {
         processBRNNBBBFS(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_SA)
         processSA(graph, config, knownMinPathCost);
+    #elif defined(BUILD_GENERIC)
+        processGenetic(graph, config, knownMinPathCost);
     #else
         std::cout << "No function is defined to call!" << std::endl;
         return 1;

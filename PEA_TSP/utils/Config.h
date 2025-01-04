@@ -24,6 +24,10 @@ private:
 	double finalTemperature = 0;
 	double coolingRate = 0;
 
+    double mutationRate = 0.1;
+    int mu = 30;
+    int lambda = 100;
+
 	CoolingSchema coolingSchema = CoolingSchema::Exponential;
 	std::string initialPathMethod = "RNN";
 
@@ -55,6 +59,9 @@ public:
 	double getFinalTemperature();
 	double getCoolingRate();
 	CoolingSchema getCoolingSchema();
+	double getMutationRate();
+	int getMu();
+	int getLambda();
 	std::string getInitialPathMethod();
     int getPatience();
 

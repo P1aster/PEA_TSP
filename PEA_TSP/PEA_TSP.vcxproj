@@ -112,7 +112,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BUILD_SA</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILD_BRNN_BB_DFS</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>
@@ -134,7 +134,9 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">BUILD_RNN</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="ErrorCalculator.cpp" />
+    <ClCompile Include="Genetic.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="SA.cpp" />
     <ClCompile Include="structures\Graph.cpp" />
     <ClCompile Include="utils\Config.cpp" />
@@ -146,6 +148,8 @@
     <ClInclude Include="algorithms\R.h" />
     <ClInclude Include="algorithms\RNN.h" />
     <ClInclude Include="CoolingSchema.h" />
+    <ClInclude Include="Genetic.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="SA.h" />
     <ClInclude Include="structures\Graph.h" />
     <ClInclude Include="structures\Node.h" />

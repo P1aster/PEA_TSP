@@ -93,7 +93,7 @@ bool Config::readConfig() {
                     if (jsonObject.contains("repeatNumber")) {
                         repeatNumber = jsonObject["repeatNumber"];
                     }
-					if (jsonObject.contains("print")) {
+                    if (jsonObject.contains("print")) {
 						coutFlag = jsonObject["print"].get<bool>();
 					}
                     if (jsonObject.contains("initialTemperature")) {
@@ -105,16 +105,23 @@ bool Config::readConfig() {
                     if (jsonObject.contains("coolingRate")) {
                         coolingRate = jsonObject["coolingRate"].get<double>();
                     }
-
                     if (jsonObject.contains("initialPathMethod")) {
                         initialPathMethod = jsonObject["initialPathMethod"].get<std::string>();
                     }
-					if (jsonObject.contains("patience")) {
+                    if (jsonObject.contains("patience")) {
 						patience = jsonObject["patience"].get<int>();
 					}
-
                     if (jsonObject.contains("coolingSchema")) {
                         coolingSchema = jsonObject["coolingSchema"].get<CoolingSchema>();
+                    }
+                    if (jsonObject.contains("mutationRate")) {
+                        mutationRate = jsonObject["mutationRate"].get<double>();
+                    }
+                    if (jsonObject.contains("mu")) {
+                        mu = jsonObject["mu"].get<int>();
+                    }
+                    if (jsonObject.contains("lambda")) {
+                        lambda = jsonObject["lambda"].get<int>();
                     }
 
                 }
@@ -151,6 +158,9 @@ double Config::getInitialTemperature() { return initialTemperature; };
 double Config::getFinalTemperature() { return finalTemperature; };
 double Config::getCoolingRate() { return coolingRate; };
 CoolingSchema Config::getCoolingSchema() { return coolingSchema; };
+double Config::getMutationRate() { return mutationRate; };
+int Config::getMu() { return mu; };
+int Config::getLambda() { return lambda; };
 bool Config::getCheckAllNodes() { return checkAllNodes; };
 std::vector<int> Config::getNodeList() { return nodeList; }
 

@@ -2,4 +2,4 @@ Input Path,./data/data20.txt
 Nodes Number,20
 Min path cost,
 StartNode,repeat 1,Avg Time, Best Result, Avg Absolute Err, Avg Relative Err
-,10000.419922,10000.419922,208,0.000000,0.000000%
+0,1991.027344,1991.027344,208,
