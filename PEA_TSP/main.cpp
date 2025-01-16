@@ -14,7 +14,6 @@
 #include "Genetic.h"
 
 
-
 void processGraph(
     Graph& graph,
     Config& config,
@@ -82,6 +81,7 @@ void processGraph(
     config.writeToOutputFile(std::to_string(averageAbsoluteError) + ",");
     config.writeToOutputFile(std::to_string(averageRelativeErrorPercentage) + "%\n");
 }
+
 
 void processGraphWithStartNodes(
     Graph& graph,
@@ -158,6 +158,94 @@ void processGraphWithStartNodes(
         config.writeToOutputFile("\n");
     }
 }
+
+
+void processTimeStampGraph(
+    Graph& graph,
+    Config& config,
+    std::optional<unsigned int> knownMinPathCost,
+    std::function<ExtendedTSP_Result()> algorithmFunction,
+    const std::string& algorithmName
+) {
+    Time timer;
+    ErrorCalculator errorCalculator;
+    double totalAbsoluteError = 0;
+    double totalRelativeErrorPercentage = 0;
+    int repeats = config.getRepeatNumber();
+
+    TSP_Result bestResult;
+    bool firstRun = true;
+
+    config.writeToOutputFile(",");
+    for (int repeat = 0; repeat < repeats; repeat++) {
+        timer.start();
+        ExtendedTSP_Result result = algorithmFunction();
+        timer.stop();
+        if (firstRun || result.minPathCost < bestResult.minPathCost) {
+            bestResult = result;
+            firstRun = false;
+        }
+
+        config.cout("\n--" + algorithmName + "--");
+        if (knownMinPathCost.has_value()) {
+            config.cout("\nKnown min path cost: " + std::to_string(knownMinPathCost.value()));
+        }
+        config.cout("\nMin found path cost: " + std::to_string(result.minPathCost));
+        config.cout("\nBest path: \n");
+        for (int node : result.bestPath) {
+            config.cout(std::to_string(node) + " ");
+        }
+
+        float elapsedTime = timer.getElapsedTime();
+        config.cout("\nExecution time: " + std::to_string(elapsedTime) + " ms\n");
+
+   
+        for (const auto& res : result.timeStampData) {
+            config.writeToOutputFile(std::to_string(res.cost) + ",");
+        }
+ 
+        if (knownMinPathCost.has_value()) {
+            errorCalculator.setTrueValue(knownMinPathCost.value());
+            double absoluteError = errorCalculator.calculateAbsoluteError(result.minPathCost);
+            double relativeErrorPercentage = errorCalculator.calculateRelativeError(result.minPathCost);
+
+            config.cout("\nAbsolute Error: " + std::to_string(absoluteError));
+            config.cout("\nRelative Error: " + std::to_string(relativeErrorPercentage) + "%\n\n");
+
+            totalAbsoluteError += absoluteError;
+            totalRelativeErrorPercentage += relativeErrorPercentage;
+
+
+            config.writeToOutputFile(std::to_string(absoluteError) + ",");
+            config.writeToOutputFile(std::to_string(relativeErrorPercentage) + ",");
+            if (result.instructedInitailTemp.has_value()) {
+                config.writeToOutputFile(std::to_string(result.instructedInitailTemp.value()) + ",");
+            }
+
+        }
+
+        config.writeToOutputFile("\n,");
+        for (const auto& res : result.timeStampData) {
+            config.writeToOutputFile(std::to_string(res.duration) + ",");
+        }
+
+    }
+
+    double averageAbsoluteError = totalAbsoluteError / repeats;
+    double averageRelativeErrorPercentage = totalRelativeErrorPercentage / repeats;
+
+    int bestMinPathCost = bestResult.minPathCost;
+
+    // Write the final results including the best path cost found
+    config.writeToOutputFile(std::to_string(bestMinPathCost) + ",");
+    config.writeToOutputFile(std::to_string(averageAbsoluteError) + ",");
+    config.writeToOutputFile(std::to_string(averageRelativeErrorPercentage) + "%\n");
+    
+
+}
+
+
+
 void processBF(Graph& graph, Config& config, const std::vector<int>& nodesList, std::optional<int> knownMinPathCost) {
     BF bf(graph);
 
@@ -273,27 +361,27 @@ void processSA(Graph& graph, Config& config, std::optional<int> knownMinPathCost
     std::optional<int> maxDuration = config.getMaxDuration();
 	CoolingSchema coolingSchema = config.getCoolingSchema();
 
-
 	auto algorithmFunction = [&sa, initTemp, finalTemp, coolingR, coolingSchema, patience, initialPathMethod, maxDuration, knownMinPathCost]() {
 		return sa.run(initTemp, finalTemp, coolingR, coolingSchema, patience, initialPathMethod, maxDuration, knownMinPathCost);
 		};
-	processGraph(graph, config, knownMinPathCost, algorithmFunction, "SA");
+    processTimeStampGraph(graph, config, knownMinPathCost, algorithmFunction, "SA");
 }
 
 void processGenetic(Graph& graph, Config& config, std::optional<int> knownMinPathCost) {
     Genetic genetic(graph);
 
 	double mutationRate = config.getMutationRate();
+    double crossoverRate = config.getCrossoverRate();
 	int mu = config.getMu();
 	int lambda = config.getLambda();
     std::optional<int> maxDuration = config.getMaxDuration();
 
 
-	auto algorithmFunction = [&genetic, mutationRate, mu, lambda, knownMinPathCost, maxDuration]() {
-		return genetic.run(mu, lambda, -1, mutationRate, knownMinPathCost, maxDuration);
+	auto algorithmFunction = [&genetic, mutationRate, crossoverRate, mu, lambda, knownMinPathCost, maxDuration]() {
+		return genetic.run(mu, lambda, -1, mutationRate, crossoverRate, knownMinPathCost, maxDuration);
 	};
 
-    processGraph(graph, config, knownMinPathCost, algorithmFunction, "GENETIC");
+    processTimeStampGraph(graph, config, knownMinPathCost, algorithmFunction, "GENETIC");
 
 }
 
@@ -314,7 +402,9 @@ int main(int argslen, char* args[]) {
 
     if (graph.loadFromFile(filePath)) {
         std::cout << "Loaded graph from file: " << filePath << "\n\n";
-        graph.printMatrix();
+        if (graph.getNodesNumber() < 50) {
+            graph.printMatrix();
+        }
         std::cout << std::endl;
     }
     else {
@@ -366,7 +456,7 @@ int main(int argslen, char* args[]) {
         processBRNNBBBFS(graph, config, nodesList, knownMinPathCost);
     #elif defined(BUILD_SA)
         processSA(graph, config, knownMinPathCost);
-    #elif defined(BUILD_GENERIC)
+    #elif defined(BUILD_GA)
         processGenetic(graph, config, knownMinPathCost);
     #else
         std::cout << "No function is defined to call!" << std::endl;

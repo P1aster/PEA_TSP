@@ -1,3 +1,4 @@
-./data/data20.txt
+./data/data323.txt
 ./output/output.csv
-{"checkAllNodes": false, "nodeList": [0], "maxDuration": 10000, "repeatNumber": 1, "print": true, "initialTemperature": 100000, "finalTemperature": 0.001, "coolingRate": 0.995, "patience": 100, "coolingSchema": 1, "mutationRate": 0.1, "mu": 30, "lambda": 100}
+{"maxDuration": 10000, "repeatNumber": 1, "print": true, "initialTemperature": 100000, "finalTemperature": 0.001, "coolingRate": 0.995, "patience": 100, "coolingSchema": 1, "initialPathMethod": "RNN", "mutationRate": 0.1, "crossoverRate": 0.9, "mu": 30, "lambda": 100}
+

@@ -117,6 +117,9 @@ bool Config::readConfig() {
                     if (jsonObject.contains("mutationRate")) {
                         mutationRate = jsonObject["mutationRate"].get<double>();
                     }
+                    if (jsonObject.contains("crossoverRate")) {
+                        crossoverRate = jsonObject["crossoverRate"].get<double>();
+                    }
                     if (jsonObject.contains("mu")) {
                         mu = jsonObject["mu"].get<int>();
                     }
@@ -159,6 +162,7 @@ double Config::getFinalTemperature() { return finalTemperature; };
 double Config::getCoolingRate() { return coolingRate; };
 CoolingSchema Config::getCoolingSchema() { return coolingSchema; };
 double Config::getMutationRate() { return mutationRate; };
+double Config::getCrossoverRate() { return crossoverRate; };
 int Config::getMu() { return mu; };
 int Config::getLambda() { return lambda; };
 bool Config::getCheckAllNodes() { return checkAllNodes; };
@@ -204,13 +208,15 @@ void Config::preprocessOutputFile(std::optional<int> knownMinPathCost, int nodes
     if (knownMinPathCost.has_value()) {
         this->writeToOutputFile(std::to_string(knownMinPathCost.value()));
     }
+
+	this->writeToOutputFile("\n\n");
     
 
-    this->writeToOutputFile("\nStartNode");
-    for (int repeat = 0; repeat < repeatNumber; repeat++) {
+    //this->writeToOutputFile("\nStartNode");
+    /*for (int repeat = 0; repeat < repeatNumber; repeat++) {
         this->writeToOutputFile(",repeat " + std::to_string(repeat + 1));
-    }
-    this->writeToOutputFile(",Avg Time, Best Result, Avg Absolute Err, Avg Relative Err\n");
+    }*/
+    //this->writeToOutputFile(",Avg Time, Best Result, Avg Absolute Err, Avg Relative Err\n");
 
 }
 

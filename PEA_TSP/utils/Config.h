@@ -25,6 +25,7 @@ private:
 	double coolingRate = 0;
 
     double mutationRate = 0.1;
+    double crossoverRate = 1.0;
     int mu = 30;
     int lambda = 100;
 
@@ -60,6 +61,7 @@ public:
 	double getCoolingRate();
 	CoolingSchema getCoolingSchema();
 	double getMutationRate();
+    double getCrossoverRate();
 	int getMu();
 	int getLambda();
 	std::string getInitialPathMethod();

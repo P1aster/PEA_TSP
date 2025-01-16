@@ -130,15 +130,13 @@ Path Genetic::crossover(const Path& parent1, const Path& parent2) {
 }
 
 // Main genetic algorithm function
-void Genetic::solve(int mu, int lambda, int generations, double mutationRate) {
+void Genetic::solve(int mu, int lambda, int generations, double mutationRate, double crossoverRate) {
 
     if (mu >= lambda) {
         throw std::invalid_argument("Lambda must be greater than mu in (μ,λ) evolution strategy");
     }
 	int iterations = 0;
 
-    // Initialize timer
-    Time timer;
     timer.start();
 
     // Generate initial parent population of size μ
@@ -154,13 +152,22 @@ void Genetic::solve(int mu, int lambda, int generations, double mutationRate) {
     }
 
 
+    MeasureUnitObject res;
+    res.cost = bestSolution.getCost();
+    res.duration = timer.getElapsedTimeNow();
+    measureResults.push_back(res);
+
+
     // Evolution loop
    while(true) {
 
 	   iterations++;
         // Check time-based stopping criterion
-        if (maxDurationMs.has_value() && timer.getElapsedTimeNow() >= maxDurationMs.value()) {
-            break;
+        if (maxDurationMs.has_value()) {
+            float elapsedTime = timer.getElapsedTimeNow();
+            if (elapsedTime >= maxDurationMs.value()) {
+                break;
+            }
         }
 
         // Check if we found solution with known minimum cost
@@ -182,8 +189,16 @@ void Genetic::solve(int mu, int lambda, int generations, double mutationRate) {
             parent1 = selection_turnament(parents);
             parent2 = selection_turnament(parents);
 
+            std::uniform_real_distribution<> crossDis(0.0, 1.0);
+
+            if (crossDis(gen) > crossoverRate) {
+                continue;
+            }
+
             // Create offspring through crossover
             Path child = crossover(parent1, parent2);
+
+
 
             // Apply mutation with given probability
             std::uniform_real_distribution<> mutDis(0.0, 1.0);
@@ -201,6 +216,12 @@ void Genetic::solve(int mu, int lambda, int generations, double mutationRate) {
             // Update best solution if necessary
             if (child.getCost() < bestSolution.getCost()) {
                 bestSolution = child;
+
+                MeasureUnitObject res;
+                res.cost = bestSolution.getCost();
+                res.duration = timer.getElapsedTimeNow();
+                measureResults.push_back(res);
+
             }
         }
 
@@ -210,6 +231,10 @@ void Genetic::solve(int mu, int lambda, int generations, double mutationRate) {
                 return a.getCost() < b.getCost();
             }
         );
+
+        if (offspring.empty()) {
+            continue; 
+        }
 
         // Select μ best offspring as new parents (comma strategy)
         parents.clear();
@@ -231,8 +256,8 @@ void Genetic::solve(int mu, int lambda, int generations, double mutationRate) {
  * @param mutationRate - mutation rate
  */
 
-TSP_Result Genetic::run(int mu, int lambda, int generations, double mutationRate, std::optional<int> knownMinPathCost, std::optional<int> maxDurationMs) {
-    TSP_Result result;
+ExtendedTSP_Result Genetic::run(int mu, int lambda, int generations, double mutationRate, double crossoverRate, std::optional<int> knownMinPathCost, std::optional<int> maxDurationMs) {
+    ExtendedTSP_Result result;
 
 
     if (knownMinPathCost.has_value()) {
@@ -246,11 +271,11 @@ TSP_Result Genetic::run(int mu, int lambda, int generations, double mutationRate
 		this->maxDurationMs = std::nullopt;
 	}
 	
-    solve(mu, lambda, generations, mutationRate);
+    solve(mu, lambda, generations, mutationRate, crossoverRate);
 	
     result.bestPath = bestSolution.getNodesList();
 	result.minPathCost = bestSolution.getCost();
-
+	result.timeStampData = measureResults;
 
 	return result;
 }

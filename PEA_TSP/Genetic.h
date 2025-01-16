@@ -4,6 +4,8 @@
 #include <random>
 #include <optional>
 #include "structures/TSP_Result.h"
+#include "MeasureUnitObject.h"
+#include "utils/time.h"
 class Genetic
 {
 	private:
@@ -12,6 +14,9 @@ class Genetic
 		int nodesNumber;
 		std::random_device rd;
 		std::mt19937 gen;
+
+		Time timer;
+		std::vector<MeasureUnitObject> measureResults;
 
 		std::optional<int> knownMinPathCost;
 		std::optional<int> maxDurationMs;
@@ -23,22 +28,20 @@ class Genetic
 		Path mutate_invert(Path path);
 
 		Path selection_turnament(const std::vector<Path>& population);
-		Path selection_rouletteWheel(const std::vector<Path>& population);
-
 
 		Path crossover(const Path& parent1, const Path& parent2);
 
 		Path generateRandomPath();
 		std::vector<Path> generateInitialPopulation(int populationSize);
 
-		void solve(int mu, int lambda, int generations, double mutationRate);
+		void solve(int mu, int lambda, int generations, double mutationRate, double crossoverRate);
 
 
 
 	public:
 
 		Genetic(Graph graph);
-		TSP_Result run(int mu, int lambda, int generations, double mutationRate, std::optional<int> knownMinPathCost = std::nullopt, std::optional<int> maxDurationMs = std::nullopt);
+		ExtendedTSP_Result run(int mu, int lambda, int generations, double mutationRate, double crossoverRate, std::optional<int> knownMinPathCost = std::nullopt, std::optional<int> maxDurationMs = std::nullopt);
 
 
 };

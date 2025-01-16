@@ -112,7 +112,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BUILD_BRNN_BB_DFS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILD_GA</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>
@@ -149,6 +149,7 @@
     <ClInclude Include="algorithms\RNN.h" />
     <ClInclude Include="CoolingSchema.h" />
     <ClInclude Include="Genetic.h" />
+    <ClInclude Include="MeasureUnitObject.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="SA.h" />
     <ClInclude Include="structures\Graph.h" />
