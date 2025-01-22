@@ -33,6 +33,8 @@ private:
 
 	bool accept(int currCost, int newCost, double temperature);
 	std::vector<int> determinNewSolution(const std::vector<int>& current_solution);
+	int calculateCost(const std::vector<int>& curr);
+
 
 public:
 	SA(Graph graph);
@@ -47,7 +49,6 @@ public:
 		std::optional<int> knownMinPathCost = std::nullopt
 	);
 	void simulatedAnnealing(TSP_Result initial_result);
-	int calculateCost(std::vector<int>& curr);
 	double calculateInitialTemperature(double acceptanceRatio, int numSamples);
 };
 

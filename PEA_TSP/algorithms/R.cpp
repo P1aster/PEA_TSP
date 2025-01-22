@@ -75,7 +75,7 @@ TSP_Result R::findBestRandomHamiltonianCircle(std::optional<int> permutations, s
     return result;
 }
 
-TSP_Result R::findFirstRandomHamiltonianCircle(std::optional<int> knownMinPathCost, std::optional<int> maxDurationMs) {
+TSP_Result R::findFirstRandomHamiltonianCircle() {
     std::random_device rd;
     std::mt19937 g(rd());
     TSP_Result result;

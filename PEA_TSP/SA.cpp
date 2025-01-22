@@ -30,6 +30,14 @@ ExtendedTSP_Result SA::run(double initialTemperature, double finalTemperature, d
 	this->finalTemperature = finalTemperature;     // Temperature at which the algorithm terminates.
 	this->coolingRate = coolingRate;               // Rate at which the temperature decreases.
 
+	if (coolingSchema.has_value()) {
+		this->coolingSchema = coolingSchema.value();
+	}
+	else {
+		this->coolingSchema = CoolingSchema::Exponential;
+	}
+
+
 	if (knownMinPathCost.has_value()) {
 		this->knownMinPathCost = knownMinPathCost.value();
 	}
@@ -49,7 +57,6 @@ ExtendedTSP_Result SA::run(double initialTemperature, double finalTemperature, d
 	}
 
 	double calculatedInitialTemperature = calculateInitialTemperature(0.75, 100);
-
 	
 	TSP_Result result;
 
@@ -87,7 +94,6 @@ ExtendedTSP_Result SA::run(double initialTemperature, double finalTemperature, d
 	Iteratively explores the solution space to find a near-optimal solution to the TSP.
 */
 void SA::simulatedAnnealing(TSP_Result initial_result) {
-
 	// Track iterations since last improvement for patience mechanism
 	int iterationsSinceLastImprovement = 0;
 	bool shouldTerminate = false;
@@ -99,16 +105,13 @@ void SA::simulatedAnnealing(TSP_Result initial_result) {
 	std::vector<int> currentPath = initial_result.bestPath;
 	int currentPathCost = initial_result.minPathCost;
 
-	int bestCostInPhase = currentPathCost;
 
-	
+
 	// Main loop: continues until the system has cooled down to the final temperature.
 	while (temperature > finalTemperature && !shouldTerminate) {
-
 		bool improvementInPhase = false;
-
 		int epochLength = std::max(2, static_cast<int>(nodesNumber * (temperature / initialTemperature)));
-
+		
 		for (int i = 0; i < epochLength; i++) {
 			// Generate a new solution by swapping two random nodes in the current path.
 			std::vector<int> newPath = determinNewSolution(currentPath);
@@ -117,9 +120,10 @@ void SA::simulatedAnnealing(TSP_Result initial_result) {
 			// Decide whether to accept the new solution based on the acceptance probability.
 			if (accept(currentPathCost, newPathCost, temperature)) {
 
-				if (currentPathCost < newPathCost) {
+				if (newPathCost < currentPathCost) {
 					iterationsSinceLastImprovement = 0;
 					improvementInPhase = true;
+
 				}
 
 				currentPath = newPath;
@@ -154,29 +158,28 @@ void SA::simulatedAnnealing(TSP_Result initial_result) {
 		}
 
 		if (!improvementInPhase) {
-			iterationsSinceLastImprovement += epochLength;
+			iterationsSinceLastImprovement++;
 		}
 
 		if (patience.has_value() && iterationsSinceLastImprovement >= patience.value()) {
-
 			temperature = std::min(temperature * 1.5, initialTemperature);
 			iterationsSinceLastImprovement = 0;
 			
-		}
-		else {
+		}else {
 			// Cool down the temperature according to the selected cooling schema.
 			switch (coolingSchema) {
 			case CoolingSchema::Linear:
-				temperature = std::max(temperature - coolingRate, finalTemperature);
+				temperature = std::max(temperature - (1 - coolingRate), finalTemperature);
 				break;
 			case CoolingSchema::Exponential:
 				temperature *= coolingRate;
 				break;
 			case CoolingSchema::Logarithmic:
-				temperature /= (1 + coolingRate * log(1 + temperature));
+				temperature /= (1 + (1 - coolingRate) * log(1 + temperature));
 				break;
 			}
 		}
+		
 	}
 }
 
@@ -205,11 +208,12 @@ double SA::calculateInitialTemperature(double acceptanceProbability = 0.75, int 
 	return deltaE / std::log(1 / acceptanceProbability);
 }
 
+
 /*
 	Calculates the total cost of a given path.
 	Sums the distances between consecutive nodes and returns to the starting node.
 */
-int SA::calculateCost(std::vector<int>& curr) {
+int SA::calculateCost(const std::vector<int>& curr) {
 	int cost = 0;
 	for (int i = 0; i < nodesNumber - 1; ++i) {
 		cost += matrix[curr[i]][curr[i + 1]];

@@ -203,6 +203,7 @@ void processTimeStampGraph(
         for (const auto& res : result.timeStampData) {
             config.writeToOutputFile(std::to_string(res.cost) + ",");
         }
+        config.writeToOutputFile(",");
  
         if (knownMinPathCost.has_value()) {
             errorCalculator.setTrueValue(knownMinPathCost.value());
@@ -235,7 +236,7 @@ void processTimeStampGraph(
     double averageRelativeErrorPercentage = totalRelativeErrorPercentage / repeats;
 
     int bestMinPathCost = bestResult.minPathCost;
-
+    config.writeToOutputFile(",");
     // Write the final results including the best path cost found
     config.writeToOutputFile(std::to_string(bestMinPathCost) + ",");
     config.writeToOutputFile(std::to_string(averageAbsoluteError) + ",");
@@ -360,6 +361,7 @@ void processSA(Graph& graph, Config& config, std::optional<int> knownMinPathCost
     std::string initialPathMethod = config.getInitialPathMethod();
     std::optional<int> maxDuration = config.getMaxDuration();
 	CoolingSchema coolingSchema = config.getCoolingSchema();
+	
 
 	auto algorithmFunction = [&sa, initTemp, finalTemp, coolingR, coolingSchema, patience, initialPathMethod, maxDuration, knownMinPathCost]() {
 		return sa.run(initTemp, finalTemp, coolingR, coolingSchema, patience, initialPathMethod, maxDuration, knownMinPathCost);

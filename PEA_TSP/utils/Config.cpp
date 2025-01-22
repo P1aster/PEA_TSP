@@ -112,7 +112,24 @@ bool Config::readConfig() {
 						patience = jsonObject["patience"].get<int>();
 					}
                     if (jsonObject.contains("coolingSchema")) {
-                        coolingSchema = jsonObject["coolingSchema"].get<CoolingSchema>();
+                        int res = jsonObject["coolingSchema"].get<int>(); 
+                        switch (res) {
+                        case 1:
+							coolingSchema = CoolingSchema::Linear;
+                            break;
+                        case 2:
+                            coolingSchema = CoolingSchema::Exponential;
+
+                            break;
+                        case 3:
+                            coolingSchema = CoolingSchema::Logarithmic;
+
+                            break;
+                        default:
+							std::cerr << "Invalid cooling schema: " << res << std::endl;
+                            break;
+                        }
+
                     }
                     if (jsonObject.contains("mutationRate")) {
                         mutationRate = jsonObject["mutationRate"].get<double>();
