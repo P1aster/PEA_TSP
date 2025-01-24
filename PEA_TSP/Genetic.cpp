@@ -73,8 +73,7 @@ Path Genetic::selection_turnament(const std::vector<Path>& population) {
 
     int N = population.size();
 
-    // Generate random tournament size r where 2 ≤ r < N
-    std::uniform_int_distribution<> sizeDis(2, N - 1);
+    std::uniform_int_distribution<> sizeDis(2, std::min(N, 20));
     int r = sizeDis(gen);
 
     // Select r random individuals for tournament
